@@ -1,0 +1,55 @@
+/* CropManagement.css */
+
+.crop-section {
+  width: 100%;
+  padding: 3rem 2rem;
+  background: #ffffff;
+}
+
+.section-title {
+  text-align: center;
+  color: #065f46;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+}
+
+/* Card container */
+.card-container {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* Individual card */
+.card {
+  width: 260px;
+  background: linear-gradient(to bottom right, #f0fdf4, #d1fae5);
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  font-weight: 600;
+  color: #064e3b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(0, 128, 0, 0.25);
+  background: linear-gradient(to bottom right, #d1fae5, #a7f3d0);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .card-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card {
+    width: 80%;
+  }
+}

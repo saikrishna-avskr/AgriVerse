@@ -1,0 +1,19 @@
+.hero-section {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: #d1fae5; /* Tailwind green-100 */
+}
+
+.hero-heading {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #065f46;
+}
+
+.hero-text {
+  font-size: 1.125rem;
+  max-width: 640px;
+  margin: 0 auto;
+  color: #065f46;
+}

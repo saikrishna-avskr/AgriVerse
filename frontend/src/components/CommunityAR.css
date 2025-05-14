@@ -1,0 +1,46 @@
+.community-ar-section {
+  padding: 2rem;
+  background-color: #ffffff;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .card-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.card {
+  background-color: #ecfdf5; /* Tailwind's green-50 */
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.card:hover {
+  background-color: #d1fae5; /* Tailwind's green-100 */
+}
+
+.card-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #065f46;
+}
+
+.card-desc {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
