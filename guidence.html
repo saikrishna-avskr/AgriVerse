@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Crop Guidance Form</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-green-50 min-h-screen flex items-center justify-center">
+  <form action="/guidance/" method="POST" class="bg-white p-8 rounded-2xl shadow-md w-full max-w-3xl space-y-4">
+    <h2 class="text-2xl font-bold text-green-700 text-center mb-4">AI Crop Guidance Form</h2>
+
+    <!-- Location -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-gray-700">Region / State / Country</label>
+        <input type="text" name="region" required class="w-full p-2 border rounded-xl">
+      </div>
+      <div>
+        <label class="block text-gray-700">Latitude / Longitude (optional)</label>
+        <input type="text" name="latlong" placeholder="e.g., 28.6139, 77.2090" class="w-full p-2 border rounded-xl">
+      </div>
+    </div>
+
+    <!-- Soil -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-gray-700">Soil Type</label>
+        <select name="soil_type" required class="w-full p-2 border rounded-xl">
+          <option value="">-- Select --</option>
+          <option>Loamy</option>
+          <option>Sandy</option>
+          <option>Clay</option>
+          <option>Silty</option>
+          <option>Peaty</option>
+          <option>Saline</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-gray-700">Soil pH</label>
+        <input type="text" name="soil_ph" placeholder="e.g., 6.5" class="w-full p-2 border rounded-xl">
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-gray-700">Soil Moisture Content (optional)</label>
+        <input type="text" name="moisture" placeholder="e.g., 30%" class="w-full p-2 border rounded-xl">
+      </div>
+      <div>
+        <label class="block text-gray-700">Soil Fertility (NPK levels)</label>
+        <input type="text" name="npk" placeholder="e.g., N: 120, P: 60, K: 40" class="w-full p-2 border rounded-xl">
+      </div>
+    </div>
+
+    <!-- Weather -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-gray-700">Current Season</label>
+        <select name="season" required class="w-full p-2 border rounded-xl">
+          <option>Kharif</option>
+          <option>Rabi</option>
+          <option>Zaid</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-gray-700">Rainfall Pattern</label>
+        <select name="rainfall" required class="w-full p-2 border rounded-xl">
+          <option>Low</option>
+          <option>Moderate</option>
+          <option>Heavy</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-gray-700">Temperature Range</label>
+        <input type="text" name="temperature" placeholder="e.g., 25–35°C" class="w-full p-2 border rounded-xl">
+      </div>
+      <div>
+        <label class="block text-gray-700">Humidity Level</label>
+        <input type="text" name="humidity" placeholder="e.g., 70%" class="w-full p-2 border rounded-xl">
+      </div>
+    </div>
+
+    <label class="block">
+      <span class="text-gray-700">Sunlight Availability (optional)</span>
+      <input type="text" name="sunlight" placeholder="e.g., 6 hours/day" class="w-full p-2 border rounded-xl">
+    </label>
+
+    <!-- Previous Crop -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-gray-700">Previous Crop Grown</label>
+        <input type="text" name="previous_crop" class="w-full p-2 border rounded-xl">
+      </div>
+      <div>
+        <label class="block text-gray-700">Harvest Date</label>
+        <input type="date" name="harvest_date" class="w-full p-2 border rounded-xl">
+      </div>
+    </div>
+
+    <!-- Resources -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-gray-700">Irrigation Facilities</label>
+        <select name="irrigation" required class="w-full p-2 border rounded-xl">
+          <option>Drip</option>
+          <option>Sprinkler</option>
+          <option>Canal</option>
+          <option>Rainfed</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-gray-700">Fertilizer Availability</label>
+        <input type="text" name="fertilizer" placeholder="e.g., Urea, DAP" class="w-full p-2 border rounded-xl">
+      </div>
+    </div>
+
+    <label class="block">
+      <span class="text-gray-700">Equipment Access</span>
+      <input type="text" name="equipment" placeholder="e.g., Tractor, Seed Drill" class="w-full p-2 border rounded-xl">
+    </label>
+
+    <!-- Preferences -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-gray-700">Preferred Crop Types</label>
+        <input type="text" name="crop_type" placeholder="e.g., Vegetables, Commercial" class="w-full p-2 border rounded-xl">
+      </div>
+      <div>
+        <label class="block text-gray-700">Market Demand / Sale Value</label>
+        <input type="text" name="market" placeholder="e.g., High profit preferred" class="w-full p-2 border rounded-xl">
+      </div>
+    </div>
+
+    <label class="block">
+      <span class="text-gray-700">Land Size (in acres)</span>
+      <input type="number" step="0.1" name="land_size" class="w-full p-2 border rounded-xl">
+    </label>
+
+    <button type="submit" class="bg-green-600 text-white py-2 px-4 w-full mt-4 rounded-xl hover:bg-green-700">
+      Submit for AI Crop Guidance
+    </button>
+  </form>
+</body>
+</html>
