@@ -34,7 +34,7 @@ def predict_disease_view(request):
                 ),prompt
                 ]
             )
-            print(response)
+            # print(response)
             return JsonResponse({'result': response.text})
         except Exception as e:
             print(f"Error: {e}")
@@ -70,7 +70,7 @@ def predict_disease_view(request):
 #         return JsonResponse({'guidance': response.text})
     
 #     return JsonResponse({'error': 'POST required fields.'}, status=400)
-
+@csrf_exempt
 def farmer_crop_guidance(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -82,7 +82,7 @@ def farmer_crop_guidance(request):
         Latitude/Longitude: {data.get('latitude_longitude','--')}
         Soil Type: {data.get('soil_type')}
         Soil pH: {data.get('soil_ph')}
-        Soil Moisture: {data.get('soil_moisture')}
+        Soil Moisture: {data.get('soil_moisture','--')}
         NPK Levels: {data.get('soil_fertility')}
         Current Season: {data.get('season')}
         Rainfall: {data.get('rainfall')}

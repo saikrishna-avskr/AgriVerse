@@ -1,6 +1,8 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
+import GuidancePage from "./pages/GuidancePage";
+import DiseaseDetectionPage from "./pages/DiseaseDetectionPage";
 import {
   SignedIn,
   SignedOut,
@@ -38,6 +40,8 @@ function App() {
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/dashboard" element={<UserDashboard />} />
+          <Route path="/guidance" element={<GuidancePage />} />
+          <Route path="/disease-detection" element={<DiseaseDetectionPage />} />
         </Routes>
       </SignedIn>
 
