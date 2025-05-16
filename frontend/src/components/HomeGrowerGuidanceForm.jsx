@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 export default function HomeGrowerGuidanceForm() {
   const [formData, setFormData] = useState({
@@ -28,11 +29,14 @@ export default function HomeGrowerGuidanceForm() {
     setResult("Loading...");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/home_garden_guidance/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/home_garden_guidance/",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
       const data = await response.json();
       setResult(data.guidance || "No result returned.");
     } catch (error) {
@@ -183,7 +187,9 @@ export default function HomeGrowerGuidanceForm() {
           <h2 className="text-xl font-bold text-emerald-700 mb-2">
             Suggested Plants & Tips:
           </h2>
-          <p className="text-gray-800 whitespace-pre-wrap">{result}</p>
+          <div className="prose max-w-none">
+            <ReactMarkdown>{result}</ReactMarkdown>
+          </div>
         </div>
       )}
     </div>

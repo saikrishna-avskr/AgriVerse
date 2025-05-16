@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 export default function DiseaseDetectionPage() {
   const [image, setImage] = useState(null);
@@ -27,8 +28,7 @@ export default function DiseaseDetectionPage() {
       if (!response.ok) throw new Error("Failed to get prediction.");
 
       const data = await response.json();
-        setResult(data);
-        console.log(data);
+      setResult(data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -37,47 +37,49 @@ export default function DiseaseDetectionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-emerald-50 flex flex-col items-center py-8 px-4">
+      <h1 className="text-3xl font-bold text-emerald-700 mb-6">
+        Crop Disease Detection
+      </h1>
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow-md w-full max-w-md"
+        className="bg-white p-6 rounded-2xl shadow-md w-full max-w-2xl space-y-4"
       >
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          Crop Disease Detection
-        </h1>
-
+        <label className="block text-emerald-800 font-semibold mb-2">
+          Upload Crop Leaf Image
+        </label>
         <input
           type="file"
           name="image"
           accept="image/*"
           onChange={(e) => setImage(e.target.files[0])}
-          className="block w-full mb-4 border rounded px-3 py-2"
+          className="block w-full border border-emerald-200 rounded-xl px-3 py-2 bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-400"
           required
         />
 
         <button
           type="submit"
-          className="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-xl mt-2"
+          disabled={loading}
         >
-          {loading ? "Processing..." : "Submit"}
+          {loading ? "Processing..." : "Detect Disease"}
         </button>
       </form>
 
-      {error && <div className="mt-4 text-red-600 font-semibold">{error}</div>}
+      {error && (
+        <div className="mt-4 text-red-600 font-semibold text-center">
+          {error}
+        </div>
+      )}
 
       {result && (
-        <div className="mt-6 bg-white p-4 rounded shadow-md w-full max-w-md text-center">
-          <h2 className="text-xl font-semibold mb-2 text-green-700">
+        <div className="mt-6 bg-white p-6 rounded-2xl shadow-md w-full max-w-2xl">
+          <h2 className="text-xl font-bold text-emerald-700 mb-2">
             Prediction Result
           </h2>
-          {/* <p>
-            <strong>Disease:</strong> {result.disease}
-                  </p>
-                  
-          <p className="mt-2">
-            <strong>Solution:</strong> {result.solution}
-          </p> */}
-          <p>{result.result}</p>
+          <div className="prose max-w-none">
+            <ReactMarkdown>{result.result}</ReactMarkdown>
+          </div>
         </div>
       )}
     </div>

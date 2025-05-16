@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 export default function CropGuidanceForm() {
   const [formData, setFormData] = useState({
@@ -235,7 +236,9 @@ export default function CropGuidanceForm() {
           <h2 className="text-xl font-bold text-green-700 mb-2">
             AI Guidance Result:
           </h2>
-          <p className="text-gray-800 whitespace-pre-wrap">{result}</p>
+          <div className="prose max-w-none">
+            <ReactMarkdown>{result}</ReactMarkdown>
+          </div>
         </div>
       )}
     </div>
