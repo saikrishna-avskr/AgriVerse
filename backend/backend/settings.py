@@ -136,7 +136,3 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-]
