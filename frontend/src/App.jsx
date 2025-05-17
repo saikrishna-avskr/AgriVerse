@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import GuidancePage from "./pages/GuidancePage";
 import DiseaseDetectionPage from "./pages/DiseaseDetectionPage";
 import AgroMarket from "./pages/AgroMarket";
+//import AgriFeed from "./pages/AgriFeed";
 import Terrace from "./pages/Terrace";
 import {
   SignedIn,
@@ -45,6 +46,9 @@ function App() {
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/guidance" element={<GuidancePage />} />
           <Route path="/terrace" element={<Terrace />} />
+          {/* <Route path="/agrifeed" element={<AgriFeed />} /> */}
+         
+
           <Route path="/disease-detection" element={<DiseaseDetectionPage />} />
         </Routes>
       </SignedIn>

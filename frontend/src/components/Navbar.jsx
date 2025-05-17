@@ -12,6 +12,7 @@ const Navbar = () => {
         </Link>
       </div>
       <div className="navbar-links">
+        <Link to="/agrifeed" className="navbar-link">AgriFeed</Link>
         <Link to="/AgroMarket" className="navbar-link">Agro Marketplace</Link>
         <Link to="/notifications" className="navbar-link">🔔</Link>
         <Link to="/dashboard" className="navbar-link">👤</Link>
