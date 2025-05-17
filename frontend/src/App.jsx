@@ -3,6 +3,8 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import GuidancePage from "./pages/GuidancePage";
 import DiseaseDetectionPage from "./pages/DiseaseDetectionPage";
+import AgroMarket from "./pages/AgroMarket";
+import Terrace from "./pages/Terrace";
 import {
   SignedIn,
   SignedOut,
@@ -38,9 +40,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/AgroMarket" element={<AgroMarket />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/guidance" element={<GuidancePage />} />
+          <Route path="/terrace" element={<Terrace />} />
           <Route path="/disease-detection" element={<DiseaseDetectionPage />} />
         </Routes>
       </SignedIn>
