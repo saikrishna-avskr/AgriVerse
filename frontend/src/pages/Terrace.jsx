@@ -26,28 +26,35 @@ const Terrace = () => {
 
   const GEMINI_API_KEY = "AIzaSyA9Ggk7lKD5X-9iNERVRedeT3MH7_XKjbs"; // Replace with env var in production
 
-  const generateImplementation = async (idea, type) => {
-    const prompt = `Give a clear, step-by-step implementation plan for the idea: "${idea}" for a homegrower. Limit the response to 15-20 lines. Make it concise but rich in practical value. Only include useful and actionable steps.
+ const generateImplementation = async (idea, type) => {
+  const prompt = `
+  You are an expert gardening assistant.
 
-When mentioning any tools, items, or materials that the user might need to buy (like flower pots, seeds, palettes, compost bins, irrigation kits, etc.), enclose them in square brackets like [flower pots] or [compost bin].
+  Give a clear, step-by-step implementation plan for the idea: "${idea}" suitable for a home grower. Make it concise, practical, and valuable.
 
-Respond in plain text only. No Markdown, no special formatting, just use square brackets for tools/items.`;
+  ❗ Do not use markdown formatting (no **bold**, no *italics*, no special characters). 
+  ❗ Output should be in plain text only. 
+  ✅ If you mention any tools, items, or materials that the user might need to buy (e.g., flower pots, seeds, compost bin, irrigation kits), enclose them in square brackets like [flower pots].
 
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-        }),
-      }
-    );
+  Return the response as plain, numbered steps or concise instructions. No need for decoration—just helpful, structured guidance.
+  `;
 
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
-    type === "diy" ? setDiyResponse(text) : setSmartResponse(text);
-  };
+  const response = await fetch(
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+      }),
+    }
+  );
+
+  const data = await response.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+  type === "diy" ? setDiyResponse(text) : setSmartResponse(text);
+};
+
 
   return (
     <div className="bg-gradient-to-b from-green-50 to-green-100 min-h-screen p-6 md:p-12">
@@ -81,27 +88,42 @@ Respond in plain text only. No Markdown, no special formatting, just use square 
           <li>Design a budget-friendly drip irrigation system with bottles</li>
         </ul>
 
-        <label className="block text-green-800 font-medium mb-2">Select an idea to get implementation guidance:</label>
-        <select
-          className="w-full border rounded-lg px-4 py-2 mb-4"
-          value={diyOption}
-          onChange={(e) => {
-            const val = e.target.value;
-            setDiyOption(val);
-            generateImplementation(val, "diy");
-          }}
-        >
-          <option value="">-- Select a DIY Technique --</option>
-          <option value="vertical gardens using recycled bottles or wooden palettes">Vertical gardens using recycled bottles or wooden palettes</option>
-          <option value="kitchen waste into compost for natural plant nutrition">Kitchen waste into compost</option>
-          <option value="budget-friendly drip irrigation system with bottles">Drip irrigation with bottles</option>
-        </select>
-        {diyResponse && (
+      <label className="block text-green-800 font-medium mb-2">Select an idea to get implementation guidance:</label>
+<select
+  className="w-full border rounded-lg px-4 py-2 mb-4"
+  value={diyOption}
+  onChange={(e) => {
+    const val = e.target.value;
+    setDiyOption(val);
+    if (val !== "custom") generateImplementation(val, "diy");
+  }}
+>
+  <option value="">-- Select a DIY Technique --</option>
+  <option value="vertical gardens using recycled bottles or wooden palettes">Vertical gardens using recycled bottles or wooden palettes</option>
+  <option value="kitchen waste into compost for natural plant nutrition">Kitchen waste into compost</option>
+  <option value="budget-friendly drip irrigation system with bottles">Drip irrigation with bottles</option>
+  <option value="custom">Your own idea</option>
+</select>
+
+{diyOption === "custom" && (
+  <div className="mb-4">
+    <input
+      type="text"
+      placeholder="Describe your own DIY gardening idea..."
+      className="w-full border rounded-lg px-4 py-2"
+      onChange={(e) => setDiyResponse("")}
+      onBlur={(e) => generateImplementation(e.target.value, "diy")}
+    />
+  </div>
+)}
+
+{diyResponse && (
   <div
     className="bg-green-50 p-4 rounded-lg shadow text-gray-800 whitespace-pre-wrap"
     dangerouslySetInnerHTML={{ __html: convertToAffiliateLinks(diyResponse) }}
   />
 )}
+
       </section>
 
       {/* Real Growers + Image */}
@@ -116,25 +138,40 @@ Respond in plain text only. No Markdown, no special formatting, just use square 
         </p>
 
         <label className="block text-green-800 font-medium mb-2">Select a sustainable idea to get implementation guidance:</label>
-        <select
-          className="w-full border rounded-lg px-4 py-2 mb-4"
-          value={smartOption}
-          onChange={(e) => {
-            const val = e.target.value;
-            setSmartOption(val);
-            generateImplementation(val, "smart");
-          }}
-        >
-          <option value="">-- Select a Sustainability Tip --</option>
-          <option value="rainwater harvesting">Rainwater harvesting</option>
-          <option value="growing native plants">Growing native plants</option>
-        </select>
-        {smartResponse && (
+<select
+  className="w-full border rounded-lg px-4 py-2 mb-4"
+  value={smartOption}
+  onChange={(e) => {
+    const val = e.target.value;
+    setSmartOption(val);
+    if (val !== "custom") generateImplementation(val, "smart");
+  }}
+>
+  <option value="">-- Select a Sustainability Tip --</option>
+  <option value="rainwater harvesting">Rainwater harvesting</option>
+  <option value="growing native plants">Growing native plants</option>
+  <option value="custom">Your own idea</option>
+</select>
+
+{smartOption === "custom" && (
+  <div className="mb-4">
+    <input
+      type="text"
+      placeholder="Describe your sustainable gardening idea..."
+      className="w-full border rounded-lg px-4 py-2"
+      onChange={(e) => setSmartResponse("")}
+      onBlur={(e) => generateImplementation(e.target.value, "smart")}
+    />
+  </div>
+)}
+
+{smartResponse && (
   <div
     className="bg-green-50 p-4 rounded-lg shadow text-gray-800 whitespace-pre-wrap"
     dangerouslySetInnerHTML={{ __html: convertToAffiliateLinks(smartResponse) }}
   />
 )}
+
 
       </section>
   <SuccessStories />

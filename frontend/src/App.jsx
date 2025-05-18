@@ -4,8 +4,9 @@ import Home from "./pages/Home";
 import GuidancePage from "./pages/GuidancePage";
 import DiseaseDetectionPage from "./pages/DiseaseDetectionPage";
 import AgroMarket from "./pages/AgroMarket";
-//import AgriFeed from "./pages/AgriFeed";
+import PromotionForm from "./pages/PromotionForm";
 import Terrace from "./pages/Terrace";
+import AR from "./pages/AR";
 import {
   SignedIn,
   SignedOut,
@@ -46,8 +47,8 @@ function App() {
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/guidance" element={<GuidancePage />} />
           <Route path="/terrace" element={<Terrace />} />
-          {/* <Route path="/agrifeed" element={<AgriFeed />} /> */}
-         
+          <Route path="/AR" element={<AR />} />
+         <Route path="/promotions" element={<PromotionForm />} />
 
           <Route path="/disease-detection" element={<DiseaseDetectionPage />} />
         </Routes>
