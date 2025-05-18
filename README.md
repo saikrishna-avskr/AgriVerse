@@ -38,11 +38,31 @@ Welcome to **AgriVerse**, an innovative AgriTech platform designed to revolution
 
 ---
 
-### 🧑‍💻 AR Farm World – Immersive Learning
-- **Launch AR Experience**: Step into an interactive Augmented Reality farm to explore modern agriculture in an engaging, visual way.
+### 🧑‍💻 VR & AR Farm World – Immersive Learning
+- **VR & AR Experience**: Step into an interactive Virtual Reality farm to explore modern agriculture in an engaging, visual way.
 - Ideal for learning, awareness campaigns, and agri-education in schools and colleges.
 
 ---
+### 💼 Business Model
+What makes AgriVerse a viable startup idea is its income-generating strategy, combining both digital and local commerce:
+
+🔗 1. Affiliate Marketing Integration
+AgriVerse recommends agricultural products (like tools, seeds, fertilizers) based on user interests and needs. These recommendations are linked to platforms like Amazon and Flipkart, and AgriVerse earns a commission on every purchase made via these affiliate links — acting as a smart middle-layer between buyers and sellers.
+
+🧑‍🌾 2. Local Agri-Service Promotion
+AgriVerse also supports local sellers and agri-entrepreneurs. For example, individuals offering drone-based fertilizer spraying or organic farming consultations can promote their services directly on the platform. Unlike broad social platforms like Instagram, AgriVerse is agriculture-focused, so promotions are targeted, relevant, and more effective.
+
+### 🔮 Future Scope
+While AgriVerse currently functions as a service-based platform, its long-term vision includes transitioning into a product-based business. With growing revenue and user base, AgriVerse can expand to:
+
+Manufacture or directly source agricultural tools, kits, or smart devices.
+
+Build a branded agri-product line.
+
+Launch a full-scale AgriVerse Store to handle end-to-end sales and logistics.
+
+This evolution will help AgriVerse boost profit margins, create job opportunities, and become a self-sustaining agri-tech ecosystem.
+
 
 ## 🛠️ Tech Stack
 
@@ -73,7 +93,7 @@ Welcome to **AgriVerse**, an innovative AgriTech platform designed to revolution
 
 ---
 
-### 🐍 Backend Setup (Django)
+### 🐍 Backend(Django) & Frontend(React) Setup 
 
 ```bash
 cd backend
@@ -82,3 +102,9 @@ venv\Scripts\activate  # On Windows
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
+Frontend Setup (React)
+
+```bash
+cd ../frontend
+npm install
+npm run dev
