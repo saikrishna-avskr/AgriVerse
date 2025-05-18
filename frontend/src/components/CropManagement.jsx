@@ -1,12 +1,12 @@
 import React from "react";
-import "./CropManagement.css"; // Link to the custom CSS
+import "./CropManagement.css"; 
 import { useNavigate } from "react-router-dom";
 
 const cropCards = [
   { label: "Automated Disease Detection", route: "/disease-detection" },
   { label: "AI-Powered Crop & Garden Guidance", route: "/guidance" },
-  { label: "Predictive Yield Analysis", route: null },
-  { label: "Smart Crop Rotation Planning", route: null },
+  { label: "Predictive Yield Analysis", route: "/yield-predictor" },
+  { label: "Smart Crop Rotation Planning", route: "/crop-rotation" },
 ];
 
 const CropManagement = () => {

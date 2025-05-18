@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'crop',
+    'chat',
     'corsheaders',
 ]
 
@@ -136,3 +137,19 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+OPENWEATHER_API_KEY = 'b58882e56137707ffa9e46f81614302a'
+NEWSDATA_API_KEY='pub_876386bb80b0aa0bc720184d47290a9c17d77'
+GEMINI_API_KEY= os.getenv("GEMINI_API_KEY")
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}

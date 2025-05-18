@@ -22,6 +22,7 @@ export default function CropGuidanceForm() {
     crop_type: "",
     market: "",
     land_size: "",
+    language: "",
   });
 
   const [result, setResult] = useState("");
@@ -46,6 +47,26 @@ export default function CropGuidanceForm() {
     } catch (error) {
       setResult("Error occurred while fetching guidance.");
     }
+  };
+
+  // Inject Amazon product links into specific keywords
+  const injectProductLinks = (text) => {
+    if (!text) return "";
+
+    const keywords = {
+      fertilizer: "https://www.amazon.in/s?k=fertilizer",
+      vermicompost: "https://www.amazon.in/s?k=vermicompost",
+      manure: "https://www.amazon.in/s?k=manure",
+      pesticide: "https://www.amazon.in/s?k=pesticide",
+      irrigation: "https://www.amazon.in/s?k=irrigation+kit",
+    };
+
+    const pattern = new RegExp(`\\b(${Object.keys(keywords).join("|")})\\b`, "gi");
+
+    return text.replace(pattern, (match) => {
+      const url = keywords[match.toLowerCase()];
+      return `[${match}](${url})`;
+    });
   };
 
   return (
@@ -221,6 +242,13 @@ export default function CropGuidanceForm() {
             onChange={handleChange}
             value={formData.land_size}
           />
+          <input
+            className="p-2 border rounded-xl"
+            name="language"
+            placeholder="Language (e.g., English(default))"
+            onChange={handleChange}
+            value={formData.language}
+          />
         </div>
 
         <button
@@ -237,7 +265,7 @@ export default function CropGuidanceForm() {
             AI Guidance Result:
           </h2>
           <div className="prose max-w-none">
-            <ReactMarkdown>{result}</ReactMarkdown>
+            <ReactMarkdown>{injectProductLinks(result)}</ReactMarkdown>
           </div>
         </div>
       )}
