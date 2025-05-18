@@ -15,6 +15,7 @@ export default function DiseaseDetectionPage() {
 
     const formData = new FormData();
     formData.append("image", image);
+    formData.append("Language", e.target.Language.value);
 
     try {
       const response = await fetch(
@@ -56,6 +57,8 @@ export default function DiseaseDetectionPage() {
           className="block w-full border border-emerald-200 rounded-xl px-3 py-2 bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-400"
           required
         />
+        <label htmlFor="Language">Language:</label>&nbsp;
+        <input type="text" name="Language" id="Language" placeholder=" eg..English(default)" className="border border-black"/>
 
         <button
           type="submit"

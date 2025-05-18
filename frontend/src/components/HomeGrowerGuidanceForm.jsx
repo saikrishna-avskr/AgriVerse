@@ -15,6 +15,7 @@ export default function HomeGrowerGuidanceForm() {
     effort_level: "",
     preferred_plants: "",
     experience: "",
+    language: "",
   });
 
   const [result, setResult] = useState("");
@@ -172,6 +173,13 @@ export default function HomeGrowerGuidanceForm() {
             <option>Intermediate</option>
             <option>Expert</option>
           </select>
+          <input
+            className="p-2 border rounded-xl"
+            name="language"
+            placeholder="Language (e.g., English(default))"
+            onChange={handleChange}
+            value={formData.language}
+          />
         </div>
 
         <button

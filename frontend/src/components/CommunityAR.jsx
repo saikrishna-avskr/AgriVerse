@@ -1,9 +1,15 @@
-import React from 'react';
+import React from "react";
 
 const CommunityAR = () => {
   return (
     <section className="p-8 bg-white">
+<<<<<<< HEAD
       <h3 className="text-2xl font-bold mb-4">AR Farm World Immersive Experience</h3>
+=======
+      <h3 className="text-2xl font-bold mb-4">
+        AR Farm World Immersive Experience
+      </h3>
+>>>>>>> a056ec38c6655065e4e9e7ae59c0d21ac6296257
       <div className="bg-green-50 p-6 rounded-xl shadow hover:bg-green-100 transition">
         <a
           href="/frame.html"
@@ -13,7 +19,12 @@ const CommunityAR = () => {
         >
           <p className="font-semibold text-lg mb-1">Launch AR Experience</p>
           <p className="text-sm text-gray-600">
+<<<<<<< HEAD
             Step into our interactive AR farm world and learn about modern agriculture in an engaging, immersive environment.
+=======
+            Step into our interactive AR farm world and learn about modern
+            agriculture in an engaging, immersive environment.
+>>>>>>> a056ec38c6655065e4e9e7ae59c0d21ac6296257
           </p>
         </a>
       </div>

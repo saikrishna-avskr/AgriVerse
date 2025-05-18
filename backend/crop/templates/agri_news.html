@@ -1,0 +1,246 @@
+{% block content %}
+
+<!-- FontAwesome & Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+<div class="wrapper">
+    <div class="agri-card">
+        <div class="header">
+            <h2><i class="fas fa-leaf"></i> AgriNews AI Assistant</h2>
+        </div>
+
+        <div class="content-box">
+            <form method="POST" class="search-form">
+                {% csrf_token %}
+                <input type="text" name="news_query" placeholder="🔍 Search Agri Topics (e.g., organic farming, crop prices)" value="{{ query|default:'' }}" required/>
+                <input type="text" name="language" placeholder=" e.g, Telugu, English" value="{{ query|default:'English' }}" />
+                <button type="submit"><i class="fas fa-search"></i> Search</button>
+            </form>
+
+            {% if error %}
+                <div class="error-box animate__animated animate__shakeX">{{ error }}</div>
+            {% endif %}
+
+            {% if success %}
+                <div class="results animate__animated animate__fadeInUp">
+                    <h4>Results for <span class="highlight">"{{ query }}"</span></h4>
+
+                    {% if is_gemini %}
+                        <div class="ai-summary">
+                            <h5>🧠 Gemini AI Summary</h5>
+                            {{ news_summary|safe }}
+                            <div class="note"><i class="fas fa-info-circle"></i> AI-generated via Gemini API</div>
+                        </div>
+                    {% else %}
+                        <div class="news-grid">
+                            {% for article in articles %}
+                                <div class="news-card">
+                                    {% if article.image %}
+                                        <img src="{{ article.image }}" alt="Article Image">
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <h5>{{ article.title }}</h5>
+                                        <p>{{ article.description }}</p>
+                                        <a href="{{ article.url }}" target="_blank">Read More</a>
+                                    </div>
+                                    <div class="card-footer">{{ article.source }} | {{ article.published_at }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="placeholder animate__animated animate__fadeIn">
+                    <h5><i class="fas fa-newspaper"></i> Explore Agricultural Insights</h5>
+                    <p>Stay ahead with market trends, crop insights, and smart farming updates.</p>
+                    <p><small>Try queries like:<br><em>"Latest rice export news"</em><br><em>"New farming technologies 2024"</em><br><em>"Weather impact on wheat crops"</em></small></p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #101010, #1a1a1a);
+        font-family: 'Segoe UI', sans-serif;
+        color: #e0e0e0;
+    }
+
+    .wrapper {
+        max-width: 1200px;
+        margin: 50px auto;
+        padding: 20px;
+    }
+
+    .agri-card {
+        background-color: #222;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .header {
+        background: #198754;
+        padding: 25px 30px;
+        text-align: center;
+        color: #fff;
+    }
+
+    .header h2 {
+        margin: 0;
+        font-size: 1.8rem;
+    }
+
+    .content-box {
+        padding: 30px 30px 40px;
+        background-color: #1e1e1e;
+    }
+
+    .search-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 30px;
+    }
+
+    .search-form input[type="text"] {
+        flex: 1;
+        padding: 14px;
+        background: #2b2b2b;
+        border: 1px solid #198754;
+        color: white;
+        font-size: 1rem;
+        border-radius: 6px;
+    }
+
+    .search-form button {
+        padding: 14px 20px;
+        background-color: #198754;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .search-form button:hover {
+        background-color: #157347;
+    }
+
+    .error-box {
+        background: #b02a37;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-weight: bold;
+        color: white;
+    }
+
+    .results h4 {
+        text-align: center;
+        color: #00c3ff;
+        margin-bottom: 25px;
+    }
+
+    .highlight {
+        color: #ffc107;
+    }
+
+    .ai-summary {
+        background-color: #111;
+        padding: 20px;
+        border-left: 5px solid #198754;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
+        font-size: 1.05rem;
+        line-height: 1.7;
+    }
+
+    .ai-summary h5 {
+        margin-bottom: 10px;
+        color: #70e79e;
+    }
+
+    .note {
+        text-align: right;
+        font-size: 0.85rem;
+        color: #aaa;
+        margin-top: 10px;
+    }
+
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+    }
+
+    .news-card {
+        background: #2c2c2c;
+        color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .news-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+    }
+
+    .card-body {
+        padding: 15px;
+        flex: 1;
+    }
+
+    .card-body h5 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    .card-body a {
+        display: inline-block;
+        margin-top: 10px;
+        color: #84d4ff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .card-body a:hover {
+        text-decoration: underline;
+    }
+
+    .card-footer {
+        font-size: 0.85rem;
+        background-color: #151515;
+        padding: 10px 15px;
+        color: #bbb;
+    }
+
+    .placeholder {
+        text-align: center;
+        color: #aaa;
+        margin-top: 50px;
+    }
+
+    @media screen and (max-width: 600px) {
+        .search-form {
+            flex-direction: column;
+        }
+
+        .search-form input[type="text"],
+        .search-form button {
+            width: 100%;
+        }
+    }
+</style>
+
+{% endblock %}

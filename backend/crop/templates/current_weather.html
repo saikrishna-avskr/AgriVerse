@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather in {{ location.city }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style> 
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #c9d6ff, #e2e2e2);
+            color: #333;
+        }
+
+        .weather-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .current-weather {
+            margin-bottom: 40px;
+        }
+
+        .weather-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .weather-icon {
+            width: 100px;
+            height: 100px;
+        }
+
+        .weather-main h2 {
+            font-size: 2.5rem;
+            margin: 10px 0 5px;
+        }
+
+        .weather-main p {
+            margin: 3px 0;
+            font-size: 1.1em;
+        }
+
+        .weather-details {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .detail-card h4 {
+            margin: 0 0 8px 0;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .detail-card p {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        .forecast-section {
+            margin-top: 40px;
+        }
+
+        .forecast-form {
+            padding: 20px;
+            background: linear-gradient(135deg, #c8facd, #f0fff0);
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .forecast-form h2 {
+            margin-top: 0;
+        }
+
+        .forecast-form input {
+            padding: 8px;
+            width: 60px;
+            margin: 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .forecast-form button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .forecast-form button:hover {
+            background-color: #45a049;
+        }
+
+        .forecast-results h2 {
+            margin-bottom: 20px;
+            color: #2e7d32;
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .forecast-day {
+            background: linear-gradient(to bottom, #f9f9f9, #e0f7fa);
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .forecast-day:hover {
+            transform: translateY(-5px);
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .day-header h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .day-header img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .day-description {
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            font-style: italic;
+            color: #555;
+        }
+
+        .day-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .day-detail {
+            margin-bottom: 8px;
+        }
+
+        .day-detail span:first-child {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .day-detail span:last-child {
+            float: right;
+        }
+
+        .temp-range {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 5px;
+        }
+
+        .temp-high {
+            color: #e53935;
+            font-weight: bold;
+        }
+
+        .temp-low {
+            color: #1e88e5;
+            font-weight: bold;
+        }
+
+        .temp-avg {
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .weather-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .weather-icon {
+                margin-top: 10px;
+            }
+
+            .forecast-form input {
+                width: 100%;
+                margin: 10px 0;
+            }
+
+            .forecast-form {
+                text-align: center;
+            }
+            
+            .forecast-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="weather-container">
+        <div class="current-weather">
+            <div class="weather-header">
+                <h1>Current Weather in {{ location.city }}, {{ location.country }}</h1>
+                {% if current.icon %}
+                    <img src="https://openweathermap.org/img/wn/{{ current.icon }}@2x.png" 
+                         alt="{{ current.description }}" class="weather-icon">
+                {% endif %}
+            </div>
+
+            {% if current %}
+            <div class="weather-main">
+                <h2>{{ current.temp }}°C</h2>
+                <p>Feels like {{ current.feels_like }}°C</p>
+                <p>{{ current.description }}</p>
+            </div>
+
+            <div class="weather-details">
+                <div class="detail-card">
+                    <h4>Humidity</h4>
+                    <p>{{ current.humidity }}%</p>
+                </div>
+                <div class="detail-card">
+                    <h4>Wind Speed</h4>
+                    <p>{{ current.wind_speed }} m/s</p>
+                </div>
+                <div class="detail-card">
+                    <h4>Pressure</h4>
+                    <p>{{ current.pressure }} hPa</p>
+                </div>
+                <div class="detail-card">
+                    <h4>Visibility</h4>
+                    <p>{% if current.visibility %}{{ current.visibility|floatformat:1 }} km{% else %}N/A{% endif %}</p>
+                </div>
+            </div>
+            {% else %}
+            <p>Could not load current weather data.</p>
+            {% endif %}
+        </div>
+
+        <div class="forecast-section">
+            <div class="forecast-form">
+                <h2>Get Weather Forecast</h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    <label for="days">Enter number of days (1–14):</label>
+                    <input type="number" id="days" name="days" min="1" max="14" required>
+                    <button type="submit">Get Forecast</button>
+                </form>
+            </div>
+
+            {% if forecast %}
+            <div class="forecast-results">
+                <h2>{{ forecast|length }}-Day Forecast</h2>
+                <div class="forecast-grid">
+                    {% for day in forecast %}
+                    <div class="forecast-day">
+                        <div class="day-header">
+                            <h3>{{ day.date|date:"D, M j" }}</h3>
+                            <img src="https://openweathermap.org/img/wn/{{ day.icon }}.png" 
+                                 alt="{{ day.description }}">
+                        </div>
+                        <p class="day-description">{{ day.description }}</p>
+                        
+                        <div class="temp-range">
+                            <span class="temp-high">{{ day.max_temp }}°</span>
+                            <span class="temp-low">{{ day.min_temp }}°</span>
+                        </div>
+                        <div class="temp-avg">Avg: {{ day.avg_temp|floatformat:1 }}°C</div>
+                        
+                        <div class="day-details">
+                            <div class="day-detail">
+                                <span>Wind</span>
+                                <span>{{ day.wind_speed|default:"N/A" }} m/s</span>
+                            </div>
+                            <div class="day-detail">
+                                <span>Humidity</span>
+                                <span>{{ day.humidity|default:"N/A" }}%</span>
+                            </div>
+                            <div class="day-detail">
+                                <span>Pressure</span>
+                                <span>{{ day.pressure|default:"N/A" }} hPa</span>
+                            </div>
+                            <div class="day-detail">
+                                <span>Rain</span>
+                                <span>{{ day.rain|default:"0" }} mm</span>
+                            </div>
+                            <div class="day-detail">
+                                <span>Sunrise</span>
+                                <span>{{ day.sunrise|default:"N/A" }}</span>
+                            </div>
+                            <div class="day-detail">
+                                <span>Sunset</span>
+                                <span>{{ day.sunset|default:"N/A" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
