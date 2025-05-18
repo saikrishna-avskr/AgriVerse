@@ -46,10 +46,10 @@ Welcome to **AgriVerse**, an innovative AgriTech platform designed to revolution
 ### 💼 Business Model
 What makes AgriVerse a viable startup idea is its income-generating strategy, combining both digital and local commerce:
 
-🔗 1. Affiliate Marketing Integration
+-**🔗 1. Affiliate Marketing Integration**
 AgriVerse recommends agricultural products (like tools, seeds, fertilizers) based on user interests and needs. These recommendations are linked to platforms like Amazon and Flipkart, and AgriVerse earns a commission on every purchase made via these affiliate links — acting as a smart middle-layer between buyers and sellers.
 
-🧑‍🌾 2. Local Agri-Service Promotion
+-**🧑‍🌾 2. Local Agri-Service Promotion**
 AgriVerse also supports local sellers and agri-entrepreneurs. For example, individuals offering drone-based fertilizer spraying or organic farming consultations can promote their services directly on the platform. Unlike broad social platforms like Instagram, AgriVerse is agriculture-focused, so promotions are targeted, relevant, and more effective.
 
 ### 🔮 Future Scope
