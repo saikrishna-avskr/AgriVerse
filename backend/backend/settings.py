@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'crop',
     'chat',
     'corsheaders',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [

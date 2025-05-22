@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import Navbar from "../components/Navbar";
 
 export default function DiseaseDetectionPage() {
   const [image, setImage] = useState(null);
@@ -38,7 +39,9 @@ export default function DiseaseDetectionPage() {
   };
 
   return (
+    
     <div className="min-h-screen bg-emerald-50 flex flex-col items-center py-8 px-4">
+      <Navbar/><br/>
       <h1 className="text-3xl font-bold text-emerald-700 mb-6">
         Crop Disease Detection
       </h1>

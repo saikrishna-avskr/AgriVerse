@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import HomeGrowerGuidanceForm from "../components/HomeGrowerGuidanceForm"; 
 import CropGuidanceForm from "../components/CropGuidanceForm";
+import Navbar from "../components/Navbar";
 
 export default function GuidancePage() {
   const [selection, setSelection] = useState("");
 
   return (
     <div className="min-h-screen bg-green-50 flex flex-col items-center p-8">
+      <Navbar />
+      <br />
       <h1 className="text-3xl font-bold text-green-700 mb-6">
         AI-Powered Crop & Garden Guidance
       </h1>
