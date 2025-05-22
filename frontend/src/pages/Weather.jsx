@@ -101,7 +101,7 @@ const Weather = () => {
             onSubmit={handleForecastSubmit}
           >
             <label htmlFor="days" className="font-medium">
-              Enter number of days (1–14):
+              Enter number of days (1 - 6):
             </label>
             <input
               type="number"

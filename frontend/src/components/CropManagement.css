@@ -1,45 +1,51 @@
-/* CropManagement.css */
-
 .crop-section {
   width: 100%;
-  padding: 3rem 2rem;
-  background: #ffffff;
+  padding: 4rem 2rem;
+  background: linear-gradient(to right, #126735, #0c9570); /* dark green gradient */
+  min-height: 80vh;
+  color: #f0fdf4;
+  animation: fadeIn 1s ease-in;
 }
 
 .section-title {
   text-align: center;
-  color: #065f46;
-  font-size: 2.5rem;
+  font-size: 2.7rem;
   font-weight: 800;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  color: #bbf7d0;
+  text-shadow: 1px 2px 6px #22c55e;
 }
 
 /* Card container */
 .card-container {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 2rem;
   flex-wrap: wrap;
+  animation: slideUp 1s ease;
 }
 
 /* Individual card */
 .card {
   width: 260px;
-  background: linear-gradient(to bottom right, #f0fdf4, #d1fae5);
-  border-radius: 1rem;
+  background: #0a4d26;
+  border: 2px solid #10b981;
+  border-radius: 1.25rem;
   padding: 2rem;
   text-align: center;
   font-weight: 600;
-  color: #064e3b;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  color: #bbf7d0;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s;
   cursor: pointer;
+  backdrop-filter: blur(4px);
 }
 
 .card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 10px 25px rgba(0, 128, 0, 0.25);
-  background: linear-gradient(to bottom right, #d1fae5, #a7f3d0);
+  transform: scale(1.05);
+  background: linear-gradient(to bottom right, #064e3b, #10b981);
+  box-shadow: 0 0 25px rgba(34, 197, 94, 0.6), 0 0 10px rgba(16, 185, 129, 0.4);
+  color: #f0fdf4;
 }
 
 /* Responsive tweaks */
@@ -50,6 +56,75 @@
   }
 
   .card {
-    width: 80%;
+    width: 85%;
   }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+/* Wrapper for image + overlay */
+.aicrop-wrapper {
+  position: relative;
+  width: 320px;
+  margin: 4rem auto 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+
+/* Image style */
+.aicrop-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 1rem;
+  transition: transform 0.3s ease;
+}
+
+/* Overlay */
+.aicrop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* transparent black */
+  color: #f0fdf4;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+/* Text inside overlay */
+.aicrop-text h4 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 3px #000;
+}
+
+.aicrop-text p {
+  font-size: 1rem;
+  line-height: 1.5;
+  text-shadow: 1px 1px 2px #000;
+}
+
+/* Hover Effects */
+.aicrop-wrapper:hover .aicrop-img {
+  transform: scale(1.03);
+}
+
+.aicrop-wrapper:hover .aicrop-overlay {
+  opacity: 1;
 }
