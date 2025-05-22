@@ -1,0 +1,106 @@
+.climate-section {
+  padding: 2rem;
+  margin: 2rem;
+  background: linear-gradient(135deg, #0e8d47, #8df7db);
+  border-radius: 1.5rem;
+  overflow: hidden;
+  transition: all 0.5s ease;
+  transform: scale(1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* When component is in viewport */
+.active {
+  transform: scale(1.02);
+}
+
+/* On hover - zoomed state */
+.zoomed {
+  transform: scale(1.05);
+  background: linear-gradient(to right, #95d9fd, #83a6f1);
+  color: white;
+}
+
+/* Title */
+.climate-title {
+  padding-top: 3rem;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: #064e3b;
+  margin-bottom: 1.5rem;
+}
+
+/* Grid layout for cards */
+.climate-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* Individual cards */
+.climate-card {
+  background: white;
+  padding: 1.5rem 2rem;
+  padding-bottom: 2rem;
+  border-radius: 1rem;
+  width: 260px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #1e3a8a;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.climate-card:hover {
+  transform: scale(1.07);
+  background: #eff6ff;
+}
+
+/* Zoomed content (image + text) */
+.zoomed-content {
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.zoomed-img {
+  width: 180px;
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.zoomed-text h3 {
+  font-size: 1.8rem;
+  margin-bottom: 0.8rem;
+  color: #ffffff;
+}
+
+.zoomed-text p {
+  font-size: 1.1rem;
+  color: #e0f2fe;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Smooth fade effect */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

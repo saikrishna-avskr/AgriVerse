@@ -140,10 +140,8 @@ client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-<<<<<<< HEAD
 ]
-=======
-]
+
 OPENWEATHER_API_KEY = 'b58882e56137707ffa9e46f81614302a'
 NEWSDATA_API_KEY='pub_876386bb80b0aa0bc720184d47290a9c17d77'
 GEMINI_API_KEY= os.getenv("GEMINI_API_KEY")
@@ -156,4 +154,3 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ]
 }
->>>>>>> a056ec38c6655065e4e9e7ae59c0d21ac6296257
