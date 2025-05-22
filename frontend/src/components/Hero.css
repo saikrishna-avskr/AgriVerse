@@ -4,7 +4,8 @@
   align-items: center;
   justify-content: center;
   padding: 3rem 1rem;
-  background: linear-gradient(to bottom, #e3fdf6, #1f0e0a); /* light soft green */
+  background: linear-gradient(to bottom, #ecfdf8, #236822); 
+
   min-height: 80vh;
   text-align: center;
   max-height: 600px;
@@ -44,3 +45,5 @@
   max-width: 600px;
   height: 400px;
 }
+
+
