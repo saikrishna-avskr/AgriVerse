@@ -1,7 +1,7 @@
 .climate-section {
   padding: 2rem;
   margin: 2rem;
-  background: linear-gradient(135deg, #0e8d47, #8df7db);
+  background: linear-gradient(to bottom, #90ec8e, #91e790);
   border-radius: 1.5rem;
   overflow: hidden;
   transition: all 0.5s ease;
