@@ -1,0 +1,118 @@
+.cropSection {
+  width: 100%;
+  padding: 4rem 2rem;
+  background: linear-gradient(to right, #126735, #0c9570);
+  min-height: 80vh;
+  color: #f0fdf4;
+  animation: fadeIn 1s ease-in;
+}
+
+.sectionTitle {
+  text-align: center;
+  font-size: 2.7rem;
+  font-weight: 800;
+  margin-bottom: 3rem;
+  color: #bbf7d0;
+  text-shadow: 1px 2px 6px #22c55e;
+}
+
+/* Card container - no wrapping */
+.cardContainer {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: nowrap; /* keeps all in same row */
+  overflow-x: auto;   /* optional: adds scroll if too wide */
+  animation: slideUp 1s ease;
+  padding: 0 1rem;
+}
+
+/* Individual card */
+.card {
+  flex-shrink: 0;
+  width: 260px;
+  background: #0a4d26;
+  border: 2px solid #10b981;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  text-align: center;
+  font-weight: 600;
+  color: #bbf7d0;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+.card:hover {
+  transform: scale(1.05);
+  background: linear-gradient(to bottom right, #064e3b, #10b981);
+  box-shadow: 0 0 25px rgba(34, 197, 94, 0.6), 0 0 10px rgba(16, 185, 129, 0.4);
+  color: #f0fdf4;
+}
+
+/* Wrapper for image + overlay */
+.aicropWrapper {
+  position: relative;
+  width: 320px;
+  margin: 4rem auto 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+
+.aicropImg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.aicropOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  color: #f0fdf4;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.aicropText h4 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 3px #000;
+}
+
+.aicropText p {
+  font-size: 1rem;
+  line-height: 1.5;
+  text-shadow: 1px 1px 2px #000;
+}
+
+.aicropWrapper:hover .aicropImg {
+  transform: scale(1.03);
+}
+
+.aicropWrapper:hover .aicropOverlay {
+  opacity: 1;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

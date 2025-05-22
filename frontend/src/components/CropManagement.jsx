@@ -1,7 +1,6 @@
 import React from "react";
-import "./CropManagement.css";
+import "./CropManagement.css"; 
 import { useNavigate } from "react-router-dom";
-import aicropImage from "../assets/aicrop.png"; // ✅ import image from assets
 
 const cropCards = [
   { label: "Automated Disease Detection", route: "/disease-detection" },
@@ -21,36 +20,18 @@ const CropManagement = () => {
 
   return (
     <section className="crop-section">
-      <h3 className="section-title">🌿 AI Powered Crop Management</h3>
-
+      <h3 className="section-title">AI Powered Crop Management</h3>
       <div className="card-container">
         {cropCards.map((item, i) => (
           <div
             key={i}
             className="card"
+            style={item.route ? { cursor: "pointer" } : {}}
             onClick={() => handleCardClick(item.route)}
           >
             <p>{item.label}</p>
           </div>
         ))}
-      </div>
-
-      {/* Image with hover info */}
-      <div className="aicrop-wrapper">
-        <img
-          src={aicropImage}
-          alt="AI Crop Management"
-          className="aicrop-img"
-        />
-        <div className="aicrop-overlay">
-          <div className="aicrop-text">
-            <h4>AI-Powered Crop Management</h4>
-            <p>
-              Leveraging artificial intelligence to monitor crop health, predict
-              yields, and enhance sustainable farming practices.
-            </p>
-          </div>
-        </div>
       </div>
     </section>
   );

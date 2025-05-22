@@ -1,46 +1,55 @@
 .community-ar-section {
+  position: relative;
+  height: 100vh;
   padding: 2rem;
-  background-color: #ffffff;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay-content {
+  background: rgba(255, 255, 255, 0.4); /* Semi-transparent white overlay */
+  padding: 3rem;
+  border-radius: 1rem;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 .section-title {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 1rem;
-}
-
-.card-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-@media (min-width: 768px) {
-  .card-grid {
-    grid-template-columns: 1fr 1fr;
-  }
+  margin-bottom: 2rem;
+  color: #065f46;
 }
 
 .card {
-  background-color: #ecfdf5; /* Tailwind's green-50 */
-  padding: 1rem;
+  background-color: #ecfdf5;
+  padding: 2rem;
   border-radius: 0.75rem;
+  width: 100%;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-decoration: none;
   transition: background-color 0.3s ease;
 }
 
 .card:hover {
-  background-color: #d1fae5; /* Tailwind's green-100 */
+  background-color: #e8f8f0;
 }
 
 .card-title {
   font-weight: 600;
-  margin-bottom: 0.25rem;
-  color: #065f46;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #07563f;
 }
 
 .card-desc {
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: #4b5563;
 }

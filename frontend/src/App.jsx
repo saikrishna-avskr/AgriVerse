@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import GuidancePage from "./pages/GuidancePage";
 import DiseaseDetectionPage from "./pages/DiseaseDetectionPage";
 import AgroMarket from "./pages/AgroMarket";
+import AR from "./pages/AR";
 import PromotionFormPage from "./pages/PromotionFormPage";
 import Terrace from "./pages/Terrace";
 import AgriNews from "./pages/AgriNews";
@@ -51,6 +52,11 @@ function App() {
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/guidance" element={<GuidancePage />} />
           <Route path="/terrace" element={<Terrace />} />
+
+          <Route path="/AR" element={<AR />} />
+         
+
+
           <Route path="/promotions" element={<PromotionFormPage />} />
           <Route path="/agri-news" element={<AgriNews />} />
           <Route path="/crop-rotation" element={<CropRotation />} />
