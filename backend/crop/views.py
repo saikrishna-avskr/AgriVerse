@@ -342,10 +342,13 @@ def yield_predictor(request):
             model_path = os.path.join(settings.BASE_DIR, 'crop', 'crop_yield_model.joblib')
             model = joblib.load(model_path)
             predicted_yield = model.predict(input_df)[0]
-            
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            prompt = f"""Generate a responsive anser that the yield predicted by the model is {round(predicted_yield,2)} quintals per hectare for the crop {data.get('Crop')} in the year {data.get('Crop_Year')}."""
+            response = model.generate_content(prompt)
             return JsonResponse({
                 'success': True,
-                'predicted_yield': round(predicted_yield, 2),
+                'predicted_yield': response.text,
                 'input_data': data
             })
             
