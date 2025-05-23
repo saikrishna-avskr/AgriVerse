@@ -12,6 +12,9 @@ import CropRotation from "./pages/CropRotation";
 import YieldPredictor from "./pages/YieldPredictor";
 import Weather from "./pages/Weather";
 import ChatBotPage from "./pages/ChatBotPage";
+import CropGuidancePage from "./pages/CropGuidancePage";
+import HomeGrowerGuidancePage from "./pages/HomeGrowerGuidancePage";
+// import Navbar from "./components/Navbar"; 
 import {
   SignedIn,
   SignedOut,
@@ -28,22 +31,11 @@ const UserDashboard = () => <div>User Dashboard</div>;
 function App() {
   return (
     <>
-      <header
-        style={{
-          padding: "1rem",
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <SignedOut>
-          <SignInButton />
-        </SignedOut>
-        <SignedIn>
-          <UserButton />
-        </SignedIn>
-      </header>
-
+    <SignedOut>
+        <SignInButton />
+      </SignedOut>
       <SignedIn>
+  {/* <Navbar /> */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/marketplace" element={<Marketplace />} />
@@ -52,23 +44,19 @@ function App() {
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/guidance" element={<GuidancePage />} />
           <Route path="/terrace" element={<Terrace />} />
-
           <Route path="/AR" element={<AR />} />
-         
-
-
+          <Route path="/crop-guidance" element={<CropGuidancePage />} />
+          <Route path="/home-grower-guidance" element={<HomeGrowerGuidancePage />} />     
           <Route path="/promotions" element={<PromotionFormPage />} />
           <Route path="/agri-news" element={<AgriNews />} />
           <Route path="/crop-rotation" element={<CropRotation />} />
           <Route path="/yield-predictor" element={<YieldPredictor />} />
           <Route path="/weather" element={<Weather />} />
           <Route path="/chatbot" element={<ChatBotPage />} />
-          
           <Route path="/disease-detection" element={<DiseaseDetectionPage />} />
         </Routes>
       </SignedIn>
-
-      <SignedOut>
+<SignedOut>
         <RedirectToSignIn />
       </SignedOut>
     </>

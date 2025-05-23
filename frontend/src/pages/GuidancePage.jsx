@@ -1,60 +1,55 @@
-import React, { useState } from "react";
-import HomeGrowerGuidanceForm from "../components/HomeGrowerGuidanceForm"; 
-import CropGuidanceForm from "../components/CropGuidanceForm";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import gui1 from "../assets/gui2.png";
+import gui2 from "../assets/hgui1.png";
+import "./GuidancePage.css";
 
 export default function GuidancePage() {
-  const [selection, setSelection] = useState("");
+  const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-green-50 flex flex-col items-center p-8">
+    <div className="guidance-container">
       <Navbar />
-      <br />
-      <h1 className="text-3xl font-bold text-green-700 mb-6">
-        AI-Powered Crop & Garden Guidance
+      <h1 className="guidance-heading">
+        🌱 AI-Powered Crop & Garden Guidance 🌾
       </h1>
 
-      {!selection && (
-        <div className="grid gap-6 w-full max-w-2xl">
-          <button
-            onClick={() => setSelection("farmer")}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-2xl shadow text-lg"
-          >
-            🌾 I'm a Farmer - Get Crop Guidance
-          </button>
+      {/* Decorative Images */}
+      <img src={gui1} alt="Decoration 1" className="decoration-image left-img" />
+      <img src={gui2} alt="Decoration 2" className="decoration-image right-img" />
 
+      <div className="card-grid">
+        {/* Farmer Card */}
+        <div className="flash-card farmer-card">
+          <h2>🌾 I'm a Farmer</h2>
+          <p>
+            Get AI-powered crop guidance based on soil, climate, and region to
+            boost your yield.
+          </p>
           <button
-            onClick={() => setSelection("home")}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-6 rounded-2xl shadow text-lg"
+            className="guidance-button"
+            onClick={() => navigate("/crop-guidance")}
           >
-            🏡 I'm a Home Grower - Get Plant Advice
+            Get Guidance
           </button>
         </div>
-      )}
 
-      {selection === "farmer" && (
-        <>
+        {/* Home Grower Card */}
+        <div className="flash-card home-card">
+          <h2>🏡 I'm a Home Grower</h2>
+          <p>
+            Personalized plant care, setup tips, and garden advice for your
+            balcony, terrace, or backyard.
+          </p>
           <button
-            className="text-sm text-blue-500 underline mt-4"
-            onClick={() => setSelection("")}
+            className="guidance-button"
+            onClick={() => navigate("/home-grower-guidance")}
           >
-            ⬅ Back to selection
+            Get Guidance
           </button>
-          <CropGuidanceForm />
-        </>
-      )}
-
-      {selection === "home" && (
-        <>
-          <button
-            className="text-sm text-blue-500 underline mt-4"
-            onClick={() => setSelection("")}
-          >
-            ⬅ Back to selection
-          </button>
-          <HomeGrowerGuidanceForm />
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }
