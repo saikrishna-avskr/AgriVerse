@@ -1,0 +1,111 @@
+.guidance-container {
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #73ca8b, #3a703a, #3c8a3c);
+  padding: 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.guidance-heading {
+     padding-top: 30px;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #0f2319;
+  margin-bottom: 40px;
+  text-align: center;
+  text-shadow: 1px 1px 2px #cce5cc;
+}
+
+.card-grid {
+  display: flex;
+  flex-direction: column; /* Stack vertically */
+  align-items: center;
+  gap: 20px;
+  max-width: 800px;
+  width: 100%;
+  z-index: 1;
+  margin-top: 60px;
+}
+
+.flash-card {
+  background-color: #ffffff;
+  padding: 25px;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(0, 128, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.flash-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 128, 0, 0.2);
+  border-color: #81c784;
+  background-color: #f0fff4;
+}
+
+.flash-card h2 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: #2f855a;
+}
+
+.flash-card p {
+  font-size: 1rem;
+  color: #4a5568;
+  margin-bottom: 20px;
+}
+
+.guidance-button {
+  background-color: #38a169;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 999px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.guidance-button:hover {
+  background-color: #2f855a;
+}
+
+.back-button {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #3182ce;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Decoration Image Styling */
+.decoration-image {
+  position: absolute;
+  width: 550px; /* Large size close to card */
+  height: auto;
+  opacity: 0.8;
+  z-index: 0;
+  transition: transform 0.3s;
+}
+
+.left-img {
+    padding-top: 130px;
+  top: 50px;
+  left: -50px;
+  /* transform: rotate(-5deg); */
+}
+
+.right-img {
+    padding-top: 200px;
+  bottom: 20px;
+  right: -50px;
+  /* transform: rotate(5deg); */
+}
