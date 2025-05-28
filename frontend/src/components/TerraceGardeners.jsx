@@ -37,7 +37,6 @@ const TerraceGardeners = () => {
           <img src={terraceImage2} alt="Terrace Gardening" className={styles['terrace-img']} />
         </div>
 
-        {/* Text Content */}
         <div className={styles['text-box']}>
   {!hovered ? (
     <>
@@ -47,19 +46,19 @@ const TerraceGardeners = () => {
       </p>
     </>
   ) : (
-    <div className={styles['extra-content']}>
-      <h4>🏡 HomeGrower's Paradise: Terrace Gardening Guide</h4>
-      <ul>
-        <li>🌱 <strong>Getting Started:</strong> Use lightweight containers, good potting mix, and ensure sunlight & drainage.</li>
-        <li>🛠️ <strong>DIY Ideas:</strong> Vertical gardens, composting, and DIY drip irrigation.</li>
-        <li>♻️ <strong>Sustainable Tips:</strong> Rainwater harvesting, native plants, organic gardening.</li>
-        <li>🌟 <strong>Real Stories:</strong> Inspiration from Indian home gardeners.</li>
+    <div className={styles['card']}>
+      <h4 className={styles['card-title']}>HomeGrower's Paradise: Terrace Gardening Guide</h4>
+      <ul className={styles['card-list']}>
+        <li> <strong>Getting Started:</strong> Use lightweight containers, good potting mix, and ensure sunlight & drainage.</li>
+        <li><strong>DIY Ideas:</strong> Vertical gardens, composting, and DIY drip irrigation.</li>
+        <li><strong>Sustainable Tips:</strong> Rainwater harvesting, native plants, organic gardening.</li>
+        <li> <strong>Real Stories:</strong> Inspiration from Indian home gardeners.</li>
       </ul>
-      <p className={styles['highlight']}>🌸 I'm a HomeGrower – Get Guidance</p>
-      <button className={styles['btn']} onClick={handleClick}>Explore Now</button>
+      {/* <button className={styles['btn']} onClick={handleClick}>Explore Now</button> */}
     </div>
   )}
 </div>
+
 
       </div>
     </section>

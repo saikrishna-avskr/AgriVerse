@@ -1,41 +1,53 @@
-import React, { Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { useGLTF, OrbitControls, Bounds } from '@react-three/drei';
+import React, { useEffect, useState } from 'react';
 import './Hero.css';
 
-const Plant = () => {
-  const { scene } = useGLTF('/assets/plant.glb');
-
-  return (
-    <group rotation={[0, Math.PI, 0]}>
-      {/* rotate 180° to show front view if back is facing camera */}
-      <primitive object={scene} />
-    </group>
-  );
-};
-
 const Hero = () => {
+  const [weather, setWeather] = useState(null);
+
+  useEffect(() => {
+    fetch(
+      'https://api.openweathermap.org/data/2.5/weather?q=Hyderabad&appid=98e31420e53e16bac8c05e72e823f160&units=metric'
+    )
+      .then((res) => res.json())
+      .then((data) => setWeather(data));
+  }, []);
+
   return (
     <section className="hero-section">
-      <h2 className="hero-heading">
-        Welcome to <span className="highlight">AgriVerse</span>
-      </h2>
-      <p className="hero-text">
-        Empowering farmers and growers with <strong>AI</strong>, climate insights, and a
-        supportive community for <em>sustainable agriculture</em>.
-      </p>
+      <div className="hero-content">
+        <h2 className="hero-heading">
+          Welcome to <span className="highlight">AgriVerse</span>
+        </h2>
+        <p className="hero-text">
+          Empowering farmers and growers with <strong>AI</strong>, climate insights, and a
+          supportive community for <em>sustainable agriculture</em>.
+        </p>
+      </div>
 
-      <div className="model-wrapper">
-        <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-          <ambientLight intensity={0.6} />
-          <directionalLight position={[3, 3, 3]} intensity={1} />
-          <Suspense fallback={null}>
-            <Bounds fit clip observe margin={1.2}>
-              <Plant />
-            </Bounds>
-          </Suspense>
-          <OrbitControls autoRotate={false} />
-        </Canvas>
+      {/* AI Tip of the Day */}
+      <div className="ai-tip-container">
+        <p className="ai-tip-text">💡 AI Tip of the Day</p>
+        <div className="ai-tip-popup">
+          Use AI-powered image analysis to detect crop diseases early and reduce losses.
+        </div>
+      </div>
+
+      {/* Weather Report */}
+      <div className="weather-report-container">
+        <p className="weather-report-text">🌤 Weather Report</p>
+        <div className="weather-popup">
+          {weather ? (
+            <>
+              <strong>{weather.name}</strong><br />
+              {weather.weather[0].description}<br />
+              🌡 {weather.main.temp}°C<br />
+              💧 Humidity: {weather.main.humidity}%<br />
+              💨 Wind: {weather.wind.speed} m/s
+            </>
+          ) : (
+            <p>Loading...</p>
+          )}
+        </div>
       </div>
     </section>
   );

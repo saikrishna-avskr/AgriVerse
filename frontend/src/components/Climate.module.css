@@ -1,7 +1,7 @@
 .climate-section {
   padding: 2rem;
   margin: 2rem;
-  background: linear-gradient(to bottom, #90ec8e, #91e790);
+  background: linear-gradient(to bottom, #54ba52, #67cb65);
   border-radius: 1.5rem;
   overflow: hidden;
   transition: all 0.5s ease;
@@ -16,8 +16,8 @@
 
 /* On hover - zoomed state */
 .zoomed {
-  transform: scale(1.05);
-  background: linear-gradient(to right, #95d9fd, #83a6f1);
+  transform: scale(1.1);
+  background: linear-gradient(to right, #202e48, #182c59);
   color: white;
 }
 
@@ -27,7 +27,7 @@
   font-size: 2rem;
   font-weight: bold;
   text-align: center;
-  color: #064e3b;
+  color: #f8faf9;
   margin-bottom: 1.5rem;
 }
 
@@ -72,10 +72,10 @@
 }
 
 .zoomed-img {
-  width: 180px;
+  width: 190px;
   max-width: 100%;
   height: auto;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.0rem;
   border-radius: 1rem;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
