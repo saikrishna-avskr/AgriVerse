@@ -5,6 +5,7 @@ import CropManagement from '../components/CropManagement';
 import Climate from '../components/Climate';
 import CommunityAR from '../components/CommunityAR';
 import TerraceGardeners from '../components/TerraceGardeners';
+import Footer from '../components/Footer';
 
 const Home = () => {
   return (
@@ -15,6 +16,7 @@ const Home = () => {
       <Climate />
       <CommunityAR />
       <TerraceGardeners />
+      <Footer />
     </div>
   );
 };

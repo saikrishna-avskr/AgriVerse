@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import HomeGrowerGuidanceForm from "../components/HomeGrowerGuidanceForm";
-import terraceImage1 from "../assets/ter1.jpg";
-import terraceImage2 from "../assets/ter2.jpg";
-import terraceImage3 from "../assets/ter3.png";
 import SuccessStories from "../components/SuccessStories";
+import hgui1 from "../assets/hgui1.png";
+import hgui2 from "../assets/hgui2.png";
+import hgui3 from "../assets/hgui3.png";
 
 const affiliateLink = (toolName) => {
   const query = encodeURIComponent(toolName);
@@ -13,7 +13,7 @@ const affiliateLink = (toolName) => {
 const convertToAffiliateLinks = (text) => {
   return text.replace(/\[([^\]]+)\]/g, (_, item) => {
     const url = affiliateLink(item);
-    return `<a href="${url}" target="_blank" class="text-blue-600 underline hover:text-blue-800">${item}</a>`;
+    return `<a href="${url}" target="_blank" class="text-green-700 underline hover:text-green-900">${item}</a>`;
   });
 };
 
@@ -28,16 +28,16 @@ const Terrace = () => {
 
   const generateImplementation = async (idea, type) => {
     const prompt = `
-  You are an expert gardening assistant.
+You are an expert gardening assistant.
 
-  Give a clear, step-by-step implementation plan for the idea: "${idea}" suitable for a home grower. Make it concise, practical, and valuable.
+Give a clear, step-by-step implementation plan for the idea: "${idea}" suitable for a home grower. Make it concise, practical, and valuable.
 
-  ❗ Do not use markdown formatting (no **bold**, no *italics*, no special characters). 
-  ❗ Output should be in plain text only. 
-  ✅ If you mention any tools, items, or materials that the user might need to buy (e.g., flower pots, seeds, compost bin, irrigation kits), enclose them in square brackets like [flower pots].
+❗ Do not use markdown formatting (no **bold**, no *italics*, no special characters). 
+❗ Output should be in plain text only. 
+✅ If you mention any tools, items, or materials that the user might need to buy (e.g., flower pots, seeds, compost bin, irrigation kits), enclose them in square brackets like [flower pots].
 
-  Return the response as plain, numbered steps or concise instructions. No need for decoration—just helpful, structured guidance.
-  `;
+Return the response as plain, numbered steps or concise instructions. No need for decoration—just helpful, structured guidance.
+`;
 
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" +
@@ -53,62 +53,41 @@ const Terrace = () => {
 
     const data = await response.json();
     const text =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "No response received.";
+      data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
     type === "diy" ? setDiyResponse(text) : setSmartResponse(text);
   };
 
   return (
-    <div className="bg-gradient-to-b from-green-50 to-green-100 min-h-screen p-6 md:p-12">
-      <h2 className="text-4xl font-bold text-center text-green-800 mb-10 drop-shadow-md">
+    <div className="bg-gradient-to-b from-green-100 to-emerald-200 min-h-screen p-6 md:p-12">
+      <h2 className="text-4xl font-bold text-center text-emerald-800 mb-10 drop-shadow-sm">
         🌿 HomeGrower's Paradise: Terrace Gardening Guide
       </h2>
 
-      {/* Hero Image */}
-      <div className="rounded-3xl overflow-hidden shadow-lg mb-10">
-        <img
-          src={terraceImage1}
-          alt="Terrace Garden"
-          className="w-full h-80 object-cover"
-        />
-      </div>
-
-      {/* Getting Started + Image */}
-      <div className="grid md:grid-cols-2 gap-8 items-center mb-10 bg-white/90 backdrop-blur-md p-6 md:p-10 rounded-3xl shadow-md">
-        <div>
-          <h3 className="text-2xl font-semibold text-green-700 mb-4">
-            🌱 Getting Started with Your Home Garden
-          </h3>
-          <p className="text-gray-700 text-lg">
-            Whether you're working with a rooftop, balcony, or backyard, home
-            gardening begins with proper planning. Use lightweight containers,
-            nutrient-rich potting mix, and ensure your space receives adequate
-            sunlight and drainage.
-          </p>
-        </div>
-        <img
-          src={terraceImage2}
-          alt="Terrace Garden"
-          className="w-full h-64 object-cover rounded-xl shadow"
-        />
+      {/* Getting Started Section */}
+      <div className="mb-10 bg-white/90 backdrop-blur-md p-6 md:p-10 rounded-3xl shadow-md">
+        <h3 className="text-2xl font-semibold text-emerald-700 mb-4">
+          🌱 Getting Started with Your Home Garden
+        </h3>
+        <p className="text-gray-700 text-lg">
+          Whether you're working with a rooftop, balcony, or backyard, home
+          gardening begins with proper planning. Use lightweight containers,
+          nutrient-rich potting mix, and ensure your space receives adequate
+          sunlight and drainage.
+        </p>
       </div>
 
       {/* DIY Techniques */}
       <section className="mb-10 bg-white/90 backdrop-blur-md p-6 md:p-10 rounded-3xl shadow-md">
-        <h3 className="text-2xl font-semibold text-green-700 mb-4">
+        <h3 className="text-2xl font-semibold text-emerald-700 mb-4">
           🛠️ DIY Gardening Techniques
         </h3>
         <ul className="list-disc list-inside text-gray-700 text-lg space-y-2 mb-4">
-          <li>
-            Create vertical gardens using recycled bottles or wooden palettes
-          </li>
-          <li>
-            Turn your kitchen waste into compost for natural plant nutrition
-          </li>
+          <li>Create vertical gardens using recycled bottles or wooden palettes</li>
+          <li>Turn your kitchen waste into compost for natural plant nutrition</li>
           <li>Design a budget-friendly drip irrigation system with bottles</li>
         </ul>
 
-        <label className="block text-green-800 font-medium mb-2">
+        <label className="block text-emerald-800 font-medium mb-2">
           Select an idea to get implementation guidance:
         </label>
         <select
@@ -134,20 +113,18 @@ const Terrace = () => {
         </select>
 
         {diyOption === "custom" && (
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Describe your own DIY gardening idea..."
-              className="w-full border rounded-lg px-4 py-2"
-              onChange={(e) => setDiyResponse("")}
-              onBlur={(e) => generateImplementation(e.target.value, "diy")}
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Describe your own DIY gardening idea..."
+            className="w-full border rounded-lg px-4 py-2 mb-4"
+            onChange={() => setDiyResponse("")}
+            onBlur={(e) => generateImplementation(e.target.value, "diy")}
+          />
         )}
 
         {diyResponse && (
           <div
-            className="bg-green-50 p-4 rounded-lg shadow text-gray-800 whitespace-pre-wrap"
+            className="bg-emerald-50 p-4 rounded-lg shadow text-gray-800 whitespace-pre-wrap"
             dangerouslySetInnerHTML={{
               __html: convertToAffiliateLinks(diyResponse),
             }}
@@ -155,11 +132,9 @@ const Terrace = () => {
         )}
       </section>
 
-      {/* Real Growers + Image */}
-
-      {/* Smart Tips */}
+      {/* Smart Gardening Tips */}
       <section className="mb-10 bg-white/90 backdrop-blur-md p-6 md:p-10 rounded-3xl shadow-md">
-        <h3 className="text-2xl font-semibold text-green-700 mb-4">
+        <h3 className="text-2xl font-semibold text-emerald-700 mb-4">
           ♻️ Sustainable & Smart Gardening Tips
         </h3>
         <p className="text-gray-700 text-lg mb-4">
@@ -168,7 +143,7 @@ const Terrace = () => {
           lush and sustainable.
         </p>
 
-        <label className="block text-green-800 font-medium mb-2">
+        <label className="block text-emerald-800 font-medium mb-2">
           Select a sustainable idea to get implementation guidance:
         </label>
         <select
@@ -187,29 +162,30 @@ const Terrace = () => {
         </select>
 
         {smartOption === "custom" && (
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Describe your sustainable gardening idea..."
-              className="w-full border rounded-lg px-4 py-2"
-              onChange={(e) => setSmartResponse("")}
-              onBlur={(e) => generateImplementation(e.target.value, "smart")}
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Describe your sustainable gardening idea..."
+            className="w-full border rounded-lg px-4 py-2 mb-4"
+            onChange={() => setSmartResponse("")}
+            onBlur={(e) => generateImplementation(e.target.value, "smart")}
+          />
         )}
 
         {smartResponse && (
           <div
-            className="bg-green-50 p-4 rounded-lg shadow text-gray-800 whitespace-pre-wrap"
+            className="bg-emerald-50 p-4 rounded-lg shadow text-gray-800 whitespace-pre-wrap"
             dangerouslySetInnerHTML={{
               __html: convertToAffiliateLinks(smartResponse),
             }}
           />
         )}
       </section>
+
+      {/* Success Stories */}
       <SuccessStories />
+
       {/* Form Trigger */}
-      <div className="text-center">
+      <div className="text-center mb-10">
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-emerald-600 hover:bg-emerald-700 transition-all duration-300 text-white text-lg font-semibold py-3 px-6 rounded-full shadow-md"
@@ -220,10 +196,22 @@ const Terrace = () => {
 
       {/* Conditional Form */}
       {showForm && (
-        <div className="mt-10">
+        <div className="mt-4 mb-10">
           <HomeGrowerGuidanceForm />
         </div>
       )}
+
+      {/* New Image Row at Bottom */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10">
+        {[hgui1, hgui2, hgui3].map((img, i) => (
+          <img
+            key={i}
+            src={img}
+            alt={`Gardening Visual ${i + 1}`}
+            className="w-full rounded-2xl shadow-md object-cover h-60"
+          />
+        ))}
+      </div>
     </div>
   );
 };

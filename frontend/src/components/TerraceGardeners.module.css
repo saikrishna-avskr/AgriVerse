@@ -143,3 +143,53 @@
   font-size: 1.2rem;
   color: #e0f2fe;
 }
+.card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  margin: 0 auto;
+  animation: fadeSlideIn 0.4s ease;
+  transition: transform 0.3s ease-in-out;
+  color: #f0fdf4;
+  text-align: left;
+}
+
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 14px 35px rgba(255, 255, 255, 0.2);
+}
+
+.card-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #f0fdf4;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.card-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 1.2rem;
+  color: #e7ffef;
+}
+
+.card-list li {
+  margin-bottom: 0.8rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
