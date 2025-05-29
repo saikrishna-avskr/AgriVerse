@@ -1,17 +1,32 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
-import "./ChatBot.css"; 
+import "./ChatBot.css";
+import { useAuth, useUser, SignIn, SignOutButton } from "@clerk/clerk-react";
+import Navbar from "../components/Navbar";
 
 const API_BASE = "http://localhost:8000/api";
 
+const getAxiosConfig = async () => {
+  const { getToken } = useAuth();
+  const token = await getToken({ template: "updated" });
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  };
+};
+
+
 export default function ChatBotPage() {
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const { isSignedIn, getToken } = useAuth();
+  const { user } = useUser();
+
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [activeSession, setActiveSession] = useState(null);
-  const [authError, setAuthError] = useState("");
   const [editingSessionId, setEditingSessionId] = useState(null);
   const [newTitle, setNewTitle] = useState("");
   const [ttsEnabled, setTtsEnabled] = useState(true);
@@ -23,12 +38,6 @@ export default function ChatBotPage() {
   const [sending, setSending] = useState(false);
   const [awaitingPhoneNumber, setAwaitingPhoneNumber] = useState(false);
   const [location, setLocation] = useState({ latitude: null, longitude: null });
-
-  const axiosConfig = {
-    headers: {
-      Authorization: `Token ${token}`,
-    },
-  };
 
   // Get location on mount
   useEffect(() => {
@@ -62,134 +71,69 @@ export default function ChatBotPage() {
     }
   }, [selectedVoice]);
 
-  // Fetch sessions on token change
+  // Fetch sessions when signed in
   useEffect(() => {
-    if (token) {
-      axios
-        .get(`${API_BASE}/sessions/`, axiosConfig)
-        .then((res) => {
-          setSessions(res.data);
-          if (res.data.length > 0) {
-            setActiveSession(res.data[0].id);
-          } else {
-            setActiveSession(null);
-            setChatHistory([]);
-          }
-        })
-        .catch((err) => {
-          if (err.response?.status === 401) handleLogout();
-          else alert("Failed to fetch sessions");
-        });
-    } else {
-      setSessions([]);
-      setActiveSession(null);
-      setChatHistory([]);
+    if (isSignedIn) {
+      fetchSessions();
     }
-  }, [token]);
+  }, [isSignedIn]);
 
-  // Fetch chat history on session change
-  useEffect(() => {
-    if (token && activeSession) {
-      setChatHistory([]);
-      axios
-        .get(`${API_BASE}/chat/${activeSession}/`, axiosConfig)
-        .then((res) => {
-          setChatHistory(res.data);
-          setAwaitingPhoneNumber(false);
-        })
-        .catch(() => alert("Failed to fetch chat history"));
-    } else {
-      setChatHistory([]);
-    }
-  }, [activeSession, token]);
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    const username = e.target.username.value;
-    const password = e.target.password.value;
-    try {
-      const res = await axios.post(`${API_BASE}/login/`, {
-        username,
-        password,
-      });
-      localStorage.setItem("token", res.data.token);
-      setToken(res.data.token);
-      setAuthError("");
-    } catch {
-      setAuthError("Invalid credentials");
+  const fetchSessions = async () => {
+    const token = await getToken({ template: "updated" });
+    console.log("Fetching sessions with token:", token);
+    const res = await fetch(`${API_BASE}/sessions/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      setSessions(await res.json());
     }
   };
 
-  const handleLogout = () => {
-    if (window.confirm("Logout? Unsaved data will be lost.")) {
-      localStorage.removeItem("token");
-      setToken("");
-      setChatHistory([]);
-      setSessions([]);
-      setActiveSession(null);
-      setAwaitingPhoneNumber(false);
+  const fetchChatHistory = async (sessionId) => {
+    const token = await getToken({ template: "updated" });
+    const res = await fetch(`${API_BASE}/chat/${sessionId}/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      setChatHistory(await res.json());
     }
-  };
-
-  const speakText = (text) => {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    const voice = voices.find((v) => v.name === selectedVoice);
-    if (voice) utterance.voice = voice;
-    utterance.lang = voice?.lang || "en-US";
-    window.speechSynthesis.speak(utterance);
   };
 
   const handleSend = async () => {
-    if (!message.trim()) return;
-
-    if (awaitingPhoneNumber && !/^\+?\d{7,15}$/.test(message.trim())) {
-      alert("Please enter a valid phone number with country code.");
-      return;
-    }
-
+    if (!message.trim() || !activeSession) return;
     setSending(true);
-
-    try {
-      const res = await axios.post(
-        `${API_BASE}/chat/${activeSession}/`,
-        {
-          message,
-          latitude: location.latitude,
-          longitude: location.longitude,
-        },
-        axiosConfig
-      );
-
-      const userMsg = { role: "user", content: message };
-      const botMsg = { role: "assistant", content: res.data.reply };
-
-      setChatHistory((prev) => [...prev, userMsg, botMsg]);
+    const token = await getToken({ template: "updated" });
+    const res = await fetch(`${API_BASE}/chat/${activeSession}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        message,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setChatHistory((prev) => [
+        ...prev,
+        { role: "user", content: message },
+        { role: "assistant", content: data.reply },
+      ]);
       setMessage("");
-
-      if (
-        res.data.reply.toLowerCase().includes("please share your phone number")
-      ) {
-        setAwaitingPhoneNumber(true);
-      } else {
-        setAwaitingPhoneNumber(false);
-        if (ttsEnabled) speakText(res.data.reply);
-      }
-    } catch (err) {
-      alert("Failed to send message.");
-      if (err.response?.status === 401) handleLogout();
-    } finally {
-      setSending(false);
     }
+    setSending(false);
   };
 
   const handleNewSession = async () => {
     try {
+      const token = await getToken({ template: "updated" });
       const res = await axios.post(
         `${API_BASE}/sessions/`,
         { title: `Chat ${sessions.length + 1}` },
-        axiosConfig
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setSessions((prev) => [res.data, ...prev]);
       setActiveSession(res.data.id);
@@ -211,10 +155,11 @@ export default function ChatBotPage() {
       return;
     }
     try {
+      const token = await getToken({ template: "updated" });
       const res = await axios.put(
         `${API_BASE}/sessions/${id}/`,
         { title: newTitle },
-        axiosConfig
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setSessions((prev) => prev.map((s) => (s.id === id ? res.data : s)));
       setEditingSessionId(null);
@@ -262,18 +207,17 @@ export default function ChatBotPage() {
 
   const sendAudioToRevUp = async (audioBlob) => {
     try {
+      const config = await getAxiosConfig();
       const formData = new FormData();
       formData.append("audio", audioBlob, "audio.webm");
+
+      // Add multipart header
+      config.headers["Content-Type"] = "multipart/form-data";
 
       const response = await axios.post(
         `${API_BASE}/revup_stt_proxy/`,
         formData,
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        config
       );
 
       if (response.data?.transcript) {
@@ -295,23 +239,8 @@ export default function ChatBotPage() {
     }
   };
 
-  if (!token) {
-    return (
-      <div className="login">
-        <h2>Login</h2>
-        <form onSubmit={handleLogin}>
-          <input name="username" placeholder="Username" required />
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            required
-          />
-          <button type="submit">Login</button>
-        </form>
-        {authError && <p style={{ color: "red" }}>{authError}</p>}
-      </div>
-    );
+  if (!isSignedIn) {
+    return <SignIn />;
   }
 
   return (
@@ -334,7 +263,10 @@ export default function ChatBotPage() {
                 />
               ) : (
                 <span
-                  onClick={() => !sending && setActiveSession(s.id)}
+                  onClick={() => {
+                    !sending && setActiveSession(s.id);
+                    fetchChatHistory(s.id);
+                  }}
                   onDoubleClick={() => !sending && startEditing(s.id, s.title)}
                   style={{ cursor: sending ? "not-allowed" : "pointer" }}
                 >
@@ -344,10 +276,10 @@ export default function ChatBotPage() {
             </li>
           ))}
         </ul>
-        <button onClick={handleLogout}>Logout</button>
       </div>
 
       <div className="chat-container">
+        <Navbar />
         <div className="chat-history">
           {chatHistory.map((msg, idx) => (
             <div

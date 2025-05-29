@@ -11,8 +11,8 @@ from django.utils.timezone import now
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser
 
 from .models import ChatMessage, ChatSession, PendingReminder
@@ -20,6 +20,7 @@ from .utils import (
     check_for_reminder,
     trigger_price_scraping,
     get_weather_info,
+    get_email_from_clerk_request
 )
 from .tasks import send_reminder_sms
 
@@ -35,25 +36,36 @@ COORDS_REGEX = re.compile(r'([-+]?\d{1,2}(?:\.\d+)?),\s*([-+]?\d{1,3}(?:\.\d+)?)
 
 
 class ClearChatView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def delete(self, request):
-        ChatMessage.objects.filter(user=request.user).delete()
-        ChatSession.objects.filter(user=request.user).delete()
+        email = get_email_from_clerk_request(request)
+        if not email:
+            return Response({"error": "Unauthorized"}, status=401)
+        ChatMessage.objects.filter(email=email).delete()
+        ChatSession.objects.filter(email=email).delete()
         return Response({"status": "Chat history cleared."})
 
 
 class ChatSessionView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
-        sessions = ChatSession.objects.filter(user=request.user).order_by("-created_at")
+        email = get_email_from_clerk_request(request)
+        if not email:
+            return Response({"error": "Unauthorized"}, status=401)
+        sessions = ChatSession.objects.filter(email=email).order_by("-created_at")
         data = [{"id": s.id, "title": s.title, "created_at": s.created_at} for s in sessions]
+        print(data)
         return Response(data)
 
     def post(self, request):
+        email = get_email_from_clerk_request(request)
+        print("entering post")
+        if not email:
+            return Response({"error": "Unauthorized"}, status=401)
         title = request.data.get("title", "New Chat")
-        session = ChatSession.objects.create(user=request.user, title=title)
+        session = ChatSession.objects.create(email=email, title=title)
         return Response({
             "id": session.id,
             "title": session.title,
@@ -61,6 +73,9 @@ class ChatSessionView(APIView):
         }, status=status.HTTP_201_CREATED)
 
     def put(self, request, session_id=None):
+        email = get_email_from_clerk_request(request)
+        if not email:
+            return Response({"error": "Unauthorized"}, status=401)
         if not session_id:
             return Response({"error": "Session ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -69,7 +84,7 @@ class ChatSessionView(APIView):
             return Response({"error": "Title is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            session = ChatSession.objects.get(id=session_id, user=request.user)
+            session = ChatSession.objects.get(id=session_id, email=email)
             session.title = title
             session.save()
             return Response({
@@ -79,31 +94,35 @@ class ChatSessionView(APIView):
             })
         except ChatSession.DoesNotExist:
             return Response({"error": "Session not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
 class GeminiChatView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request, session_id):
-        user = request.user
+        email = get_email_from_clerk_request(request)
+        if not email:
+            return Response({"error": "Unauthorized"}, status=401)
         user_message = request.data.get("message", "").strip()
         latitude = request.data.get("latitude")
         longitude = request.data.get("longitude")
         actions = []
 
         try:
-            session = ChatSession.objects.get(id=session_id, user=user)
+            session = ChatSession.objects.get(id=session_id, email=email)
 
             if not session.phone_number:
                 if PHONE_REGEX.match(user_message):
                     session.phone_number = user_message
                     session.save()
                     reply = f"Thanks for providing your phone number: {session.phone_number}. How can I assist you today?"
-                    ChatMessage.objects.create(user=user, role="assistant", content=reply, session=session)
+                    ChatMessage.objects.create(email=email, role="assistant", content=reply, session=session)
                     return Response({"reply": reply, "actions": []})
                 else:
                     reply = "Hi! To get started, please share your phone number (include country code if applicable)."
                     return Response({"reply": reply, "actions": []})
 
-            past_msgs = ChatMessage.objects.filter(user=user, session_id=session_id).order_by("timestamp")
+            past_msgs = ChatMessage.objects.filter(email=email, session_id=session_id).order_by("timestamp")
             history = [{"role": m.role, "parts": [m.content]} for m in past_msgs]
             system_prompt = (
                 "You are AgriBot, an expert agricultural assistant. You ONLY respond to questions related to farming and agriculture. "
@@ -113,12 +132,11 @@ class GeminiChatView(APIView):
 
             session_chat = model.start_chat(history=[{"role": "user", "parts": [system_prompt]}] + history)
 
-
             if user_message.lower() == "yes":
-                pending = PendingReminder.objects.filter(user=user).last()
+                pending = PendingReminder.objects.filter(email=email).last()
                 if pending:
                     send_reminder_sms.apply_async(
-                        (user.id, session.phone_number, pending.task),
+                        (email, session.phone_number, pending.task),
                         eta=pending.time
                     )
                     actions.append(f"📲 Reminder confirmed and scheduled: {pending.task} at {pending.time.strftime('%Y-%m-%d %H:%M')}")
@@ -128,10 +146,10 @@ class GeminiChatView(APIView):
                 response = session_chat.send_message(user_message)
                 ai_reply = response.text
 
-                ChatMessage.objects.create(user=user, role="user", content=user_message, session_id=session_id)
-                ChatMessage.objects.create(user=user, role="assistant", content=ai_reply, session_id=session_id)
+                ChatMessage.objects.create(email=email, role="user", content=user_message, session=session)
+                ChatMessage.objects.create(email=email, role="assistant", content=ai_reply, session=session)
 
-                reminder_response = check_for_reminder(user, user_message, from_gemini=True)
+                reminder_response = check_for_reminder(email, user_message, from_gemini=True)
                 if reminder_response:
                     actions.append(reminder_response)
 
@@ -142,7 +160,6 @@ class GeminiChatView(APIView):
                             "reply": weather_response,
                             "actions": actions
                         })
-
                     else:
                         weather_response = get_weather_info()
                     if weather_response:
@@ -163,14 +180,16 @@ class GeminiChatView(APIView):
             return Response({"error": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get(self, request, session_id):
-        messages = ChatMessage.objects.filter(user=request.user, session_id=session_id).order_by("timestamp")
+        email = get_email_from_clerk_request(request)
+        if not email:
+            return Response({"error": "Unauthorized"}, status=401)
+        messages = ChatMessage.objects.filter(email=email, session_id=session_id).order_by("timestamp")
         history = [{"role": m.role, "content": m.content} for m in messages]
         return Response(history)
 
 
 @csrf_exempt
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser])
 def revup_stt_proxy(request):
     audio_file = request.FILES.get("audio")

@@ -5,6 +5,7 @@ import requests
 from dotenv import load_dotenv
 from django.utils.timezone import make_aware
 import google.generativeai as genai
+import jwt
 
 from .twilio_helper import send_sms
 from .scraper import scrape_prices
@@ -152,5 +153,20 @@ def get_weather_info(lat=None, lon=None):
 
     except Exception as e:
         return f"❌ Failed to fetch weather data: {str(e)}"
+
+
+def get_email_from_clerk_request(request):
+    auth_header = request.headers.get("Authorization")
+    #print("Authorization header:", auth_header)  # Add this line to decode
+    if not auth_header or not auth_header.startswith("Bearer"):
+        return None
+    token = auth_header.split(" ")[1]
+    try:
+        decoded = jwt.decode(token, options={"verify_signature": False})
+        #print("Decoded JWT:", decoded)  # Add this line to decode
+        return decoded.get("email")
+    except Exception as e:
+        print("JWT decode error:", e)
+        return None
 
 
