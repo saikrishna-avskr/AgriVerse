@@ -18,7 +18,6 @@ const getAxiosConfig = async () => {
   };
 };
 
-
 export default function ChatBotPage() {
   const { isSignedIn, getToken } = useAuth();
   const { user } = useUser();
@@ -168,6 +167,23 @@ export default function ChatBotPage() {
     }
   };
 
+  const handleDeleteSession = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this chat?")) return;
+    try {
+      const token = await getToken({ template: "updated" });
+      await axios.delete(`${API_BASE}/sessions/${id}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSessions((prev) => prev.filter((s) => s.id !== id));
+      if (activeSession === id) {
+        setActiveSession(null);
+        setChatHistory([]);
+      }
+    } catch {
+      alert("Failed to delete chat session.");
+    }
+  };
+
   useEffect(() => {
     let recorder;
     let stream;
@@ -253,26 +269,57 @@ export default function ChatBotPage() {
         <ul>
           {sessions.map((s) => (
             <li key={s.id} className={s.id === activeSession ? "active" : ""}>
-              {editingSessionId === s.id ? (
-                <input
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  onBlur={() => saveTitle(s.id)}
-                  autoFocus
+              <div className="chat-session-item">
+                {editingSessionId === s.id ? (
+                  <input
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    onBlur={() => saveTitle(s.id)}
+                    autoFocus
+                    disabled={sending}
+                  />
+                ) : (
+                  <span
+                    className="session-title"
+                    onClick={() => {
+                      !sending && setActiveSession(s.id);
+                      fetchChatHistory(s.id);
+                    }}
+                    onDoubleClick={() =>
+                      !sending && startEditing(s.id, s.title)
+                    }
+                    style={{ cursor: sending ? "not-allowed" : "pointer" }}
+                  >
+                    {s.title}
+                  </span>
+                )}
+
+                <button
+                  onClick={() => handleDeleteSession(s.id)}
                   disabled={sending}
-                />
-              ) : (
-                <span
-                  onClick={() => {
-                    !sending && setActiveSession(s.id);
-                    fetchChatHistory(s.id);
-                  }}
-                  onDoubleClick={() => !sending && startEditing(s.id, s.title)}
-                  style={{ cursor: sending ? "not-allowed" : "pointer" }}
+                  title="Delete this chat"
+                  className="delete-button"
+                  style={{ margin: "auto" }}
                 >
-                  {s.title}
-                </span>
-              )}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ verticalAlign: "middle" }}
+                  >
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+                    <line x1="10" y1="11" x2="10" y2="17" />
+                    <line x1="14" y1="11" x2="14" y2="17" />
+                  </svg>
+                </button>
+              </div>
             </li>
           ))}
         </ul>
@@ -312,37 +359,6 @@ export default function ChatBotPage() {
           <button onClick={handleSend} disabled={sending}>
             Send
           </button>
-          <button
-            onClick={toggleRecording}
-            disabled={sending}
-            style={{ backgroundColor: isRecording ? "red" : "initial" }}
-            title={isRecording ? "Stop recording" : "Start recording"}
-          >
-            🎤
-          </button>
-        </div>
-
-        <div className="tts-settings">
-          <label>
-            <input
-              type="checkbox"
-              checked={ttsEnabled}
-              onChange={(e) => setTtsEnabled(e.target.checked)}
-              disabled={sending}
-            />
-            Enable Text-to-Speech
-          </label>
-          <select
-            value={selectedVoice || ""}
-            onChange={(e) => setSelectedVoice(e.target.value)}
-            disabled={!ttsEnabled || sending}
-          >
-            {voices.map((v) => (
-              <option key={v.name} value={v.name}>
-                {v.name} ({v.lang})
-              </option>
-            ))}
-          </select>
         </div>
       </div>
     </div>

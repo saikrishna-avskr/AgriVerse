@@ -11,6 +11,7 @@ from datetime import datetime
 import joblib
 import pandas as pd
 import os
+import base64
 
 
 @csrf_exempt
@@ -20,7 +21,6 @@ def predict_disease_view(request):
             image_file = request.FILES['image']
             image_bytes = image_file.read()
             language = request.POST.get('Language', 'english')
-            print(language)
             prompt = f"""
             This is a photo of a crop leaf. Identify:
             1. Whether the leaf is healthy or diseased.
@@ -43,8 +43,8 @@ def predict_disease_view(request):
                 ),prompt
                 ]
             )
-            # print(response)
-            return JsonResponse({'result': response.text})
+            image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+            return JsonResponse({'result': response.text,'image': image_base64}, status=200)
         except Exception as e:
             print(f"Error: {e}")
             return JsonResponse({'error': str(e)}, status=500)
