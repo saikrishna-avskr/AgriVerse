@@ -16,6 +16,7 @@ import CropGuidancePage from "./pages/CropGuidancePage";
 import HomeGrowerGuidancePage from "./pages/HomeGrowerGuidancePage";
 import Consultants from "./pages/Consultants"; 
 import ConsultantForm from "./pages/ConsultantForm"; 
+import Agriverse from "./pages/Agriverse";
 // import Navbar from "./components/Navbar"; 
 import {
   SignedIn,
@@ -58,6 +59,7 @@ function App() {
           <Route path="/disease-detection" element={<DiseaseDetectionPage />} />
           <Route path="/consultants" element={<Consultants />} /> 
           <Route path="/be-consultant" element={<ConsultantForm />} />
+          <Route path="/agri" element={<Agriverse />} />
         </Routes>
       </SignedIn>
 <SignedOut>

@@ -95,6 +95,18 @@ class ChatSessionView(APIView):
         except ChatSession.DoesNotExist:
             return Response({"error": "Session not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    def delete(self, request, session_id=None):
+        email = get_email_from_clerk_request(request)
+        if not email:
+            return Response({"error": "Unauthorized"}, status=401)
+        if not session_id:
+            return Response({"error": "Session ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            session = ChatSession.objects.get(id=session_id, email=email)
+            session.delete()
+            return Response({"status": "Session deleted."})
+        except ChatSession.DoesNotExist:
+            return Response({"error": "Session not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class GeminiChatView(APIView):
     permission_classes = [AllowAny]

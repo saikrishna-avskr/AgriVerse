@@ -39,9 +39,9 @@ export default function DiseaseDetectionPage() {
   };
 
   return (
-    
     <div className="min-h-screen bg-emerald-50 flex flex-col items-center py-8 px-4">
-      <Navbar/><br/>
+      <Navbar />
+      <br />
       <h1 className="text-3xl font-bold text-emerald-700 mb-6">
         Crop Disease Detection
       </h1>
@@ -61,8 +61,13 @@ export default function DiseaseDetectionPage() {
           required
         />
         <label htmlFor="Language">Language:</label>&nbsp;
-        <input type="text" name="Language" id="Language" placeholder=" eg..English(default)" className="border border-black"/>
-
+        <input
+          type="text"
+          name="Language"
+          id="Language"
+          placeholder=" eg..English(default)"
+          className="border border-black"
+        />
         <button
           type="submit"
           className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-xl mt-2"
@@ -83,6 +88,19 @@ export default function DiseaseDetectionPage() {
           <h2 className="text-xl font-bold text-emerald-700 mb-2">
             Prediction Result
           </h2>
+          {/* image must be at center */}
+          {result.image && (
+            <img
+              src={`data:image/jpeg;base64,${result.image}`}
+              alt="Uploaded leaf"
+              className="mb-4 max-h-64 rounded-xl border "
+              style={{
+                display: "block",
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            />
+          )}
           <div className="prose max-w-none">
             <ReactMarkdown>{result.result}</ReactMarkdown>
           </div>
