@@ -15,39 +15,120 @@ const ConsultantForm = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    phone: "",
+    phone: 0,
     about: "",
     consultation: "free",
-    amount: "",
-    experience: "",
+    amount: 0,
+    experience: 0,
     address: "",
   });
 
   const navigate = useNavigate();
 
+  // Razorpay loader
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  // Payment handler
+  const handlePaymentAndSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate required fields
+    if (!form.name || !form.email || !form.phone || !form.about || !form.experience) {
+      alert("Please fill all required fields.");
+      return;
+    }
+
+    const res = await loadRazorpay();
+    if (!res) {
+      alert("Razorpay SDK failed to load. Please try again.");
+      return;
+    }
+
+    const options = {
+      key: "rzp_test_WFnrSNaNntWazE", // Replace with your Razorpay Key ID
+      amount: 10000, // Rs. 100 (amount in paise)
+      currency: "INR",
+      name: "Agriverse",
+      description: "Consultant Application Fee",
+      image: "https://via.placeholder.com/200x200/10B981/ffffff?text=🌾",
+      handler: function (response) {
+        const dbData = {
+          name: form.name,
+          email: form.email,
+          phone_number: form.phone,      // <-- match model
+          about_me: form.about,          // <-- match model
+          consultation: form.consultation,
+          amount: form.amount,
+          experience: form.experience,
+          address: form.address,
+          // payment_id: response.razorpay_payment_id,
+          // date: new Date().toISOString(),
+        };
+
+        saveConsultantToDB(dbData);
+
+        const templateParams = {
+          ...dbData,
+          from_name: form.name,
+          // other email params if needed
+        };
+
+        send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID)
+          .then(() => {
+            alert("✅ Thank you for your interest! We’ve received your application.");
+            navigate("/");
+          })
+          .catch((error) => {
+            console.error("Error sending email:", error);
+            alert("⚠️ There was a problem. Please try again. " + (error?.text || error?.message || error));
+          });
+      },
+      prefill: {
+        name: form.name,
+        email: form.email,
+        contact: form.phone,
+      },
+      notes: {
+        applicant: form.name,
+        purpose: "consultant_application",
+      },
+      theme: {
+        color: "#10B981",
+      },
+      modal: {
+        ondismiss: function () {
+          alert("Payment cancelled.");
+        },
+      },
+    };
+
+    const razorpay = new window.Razorpay(options);
+    razorpay.open();
+  };
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const message = `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nAbout: ${form.about}\nConsultation: ${form.consultation}\nAmount: ${form.amount}\nExperience: ${form.experience}\nAddress: ${form.address}`;
-    const templateParams = {
-      from_name: form.name,
-      email: form.email,
-      message: message,
-    };
-
-    send(SERVICE_ID, TEMPLATE_ID, templateParams, USER_ID)
-      .then(() => {
-        alert("✅ Thank you for your interest! We’ve received your application.");
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("Error sending email:", error);
-        alert("⚠️ There was a problem. Please try again.");
+  const saveConsultantToDB = async (data) => {
+    try {
+        console.log(data)
+      await fetch("http://localhost:8000/api/consultants/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       });
+    } catch (error) {
+      console.error("DB Error:", error);
+    }
   };
 
   return (
@@ -66,7 +147,7 @@ const ConsultantForm = () => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-7">
+        <form className="space-y-7" onSubmit={handlePaymentAndSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <input
               className={inputStyle}
@@ -93,6 +174,7 @@ const ConsultantForm = () => {
               placeholder="Phone Number"
               value={form.phone}
               onChange={handleChange}
+              required
             />
             <input
               className={inputStyle}
@@ -150,7 +232,7 @@ const ConsultantForm = () => {
             type="submit"
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-bold text-lg shadow-lg transition-all duration-200 mt-4"
           >
-            Submit Application
+            Pay & Submit Application
           </button>
         </form>
       </div>
