@@ -51,7 +51,7 @@ const CropRotation = () => {
           className="relative bg-yellow-400 text-emerald-900 font-bold px-6 py-3 rounded-xl overflow-hidden shadow-lg hover:shadow-yellow-500 transition duration-300 hover:scale-105"
         >
           <span className="relative z-10">
-            {loading ? "Thinking..." : "Reveal Suggestions"}
+            {loading ? "Thinking..." : "Suggestions"}
           </span>
           <span className="absolute top-0 left-0 w-full h-full bg-yellow-300 opacity-0 hover:opacity-20 transition duration-300"></span>
         </button>

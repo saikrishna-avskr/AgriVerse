@@ -322,11 +322,14 @@ def generate_crop_recommendations(previous_crop, forecast_data, location, langua
         return f"Could not generate recommendations. Please try again later.\n{str(e)}"
     
 @csrf_exempt
+
 def yield_predictor(request):
     if request.method == 'POST':
         try:
+            # Load JSON request body
             data = json.loads(request.body)
-            
+
+            # Build input DataFrame
             input_df = pd.DataFrame([{
                 'Crop': data.get('Crop'),
                 'Crop_Year': int(data.get('Crop_Year', datetime.now().year)),
@@ -338,27 +341,42 @@ def yield_predictor(request):
                 'Fertilizer': float(data.get('Fertilizer', 0)),
                 'Pesticide': float(data.get('Pesticide', 0))
             }])
-            
-            model_path = os.path.join(settings.BASE_DIR, 'crop', 'crop_yield_model.joblib')
-            model = joblib.load(model_path)
-            predicted_yield = model.predict(input_df)[0]
+
+            # Load model and preprocessor
+            base_path = os.path.join(settings.BASE_DIR, 'crop')
+            model = joblib.load(os.path.join(base_path, 'crop_yield_model.joblib'))
+            preprocessor = joblib.load(os.path.join(base_path, 'preprocessor.joblib'))
+
+            # Transform input using preprocessor
+            input_processed = preprocessor.transform(input_df)
+
+            # Predict yield
+            predicted_yield = float(model.predict(input_processed)[0])
+
+            # Generate response using Gemini
             genai.configure(api_key=settings.GEMINI_API_KEY)
-            model = genai.GenerativeModel("gemini-1.5-flash")
-            prompt = f"""Generate a responsive anser that the yield predicted by the model is {round(predicted_yield,2)} quintals per hectare for the crop {data.get('Crop')} in the year {data.get('Crop_Year')}."""
-            response = model.generate_content(prompt)
+            gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+            prompt = (
+                f"Generate a Nice, comprehensive answer that the predicted yield is {round(abs(predicted_yield), 2)} "
+                f"<i>quintals per hectare for the crop {data.get('Crop')} in the year {data.get('Crop_Year')}.Dont give any extra information!!\n"
+            )
+            response = gemini_model.generate_content(prompt)
+
             return JsonResponse({
                 'success': True,
-                'predicted_yield': response.text,
+                'predicted_yield': round(abs(predicted_yield), 2),
+                'response_text': response.text,
                 'input_data': data
             })
-            
+
         except Exception as e:
             return JsonResponse({
                 'success': False,
                 'error': str(e)
             }, status=400)
-    
+
     return JsonResponse({'success': False, 'error': 'POST required.'}, status=400)
+
 
 @csrf_exempt
 def agri_news(request):
@@ -389,21 +407,36 @@ The response should include the following sections:
   <li>Highlight patterns, data shifts, or emerging stories</li>
 </ul>
 
-<h3>🔹 Reputable News Sources</h3>
-<ul>
-  <li>List 3–5 real news links with proper <a href="URL">anchor text</a></li>
-</ul>
+
 
 <h3>🔹 Potential Impact on Farmers</h3>
 <p>Write 2–3 sentences on how this news may affect farmers (economically, operationally, etc.)</p>
-
-Use only HTML formatting. Avoid markdown. Use <b> tags to emphasize key terms and <br> if needed.
-Avoid repeating the query in every section.
-don't include any disclaimers or unnecessary information. like html
+ 
+Note: don't include any disclaimers or unnecessary information. like html
 """
             response = model.generate_content(prompt)
             news_summary = response.text.replace('•', '<br>•')
-            return JsonResponse({'success': True, 'news_summary': news_summary})
+            
+            prompt = f"""
+You are an {language} expert agriculture news summarizer.
+
+Give working actual online links for : <b>{query}</b>
+
+The response should include Only:  <h3>🔹 Reputable News Sources</h3>
+<ul>
+  <li>List 3–5 real news links with proper <a href="URL">anchor text</a></li>
+</ul>
+ 
+Note: don't include any disclaimers or unnecessary information. like html
+"""
+            
+            reputable_sources = model.generate_content(prompt)
+
+            return JsonResponse({
+                'success': True,
+                'news_summary': news_summary,
+                'reputable_sources': reputable_sources.text
+            })
         except Exception as e:
             return JsonResponse({'success': False, 'error': f"⚠️ Failed to generate news: {str(e)}"}, status=500)
     return JsonResponse({'success': False, 'error': 'POST required.'}, status=400)

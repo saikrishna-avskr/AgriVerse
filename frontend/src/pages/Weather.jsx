@@ -40,162 +40,136 @@ const Weather = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto my-10 p-6 bg-white rounded-2xl shadow-lg">
-      <div className="mb-10">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-2xl font-bold">
-            Current Weather in {location.city}, {location.country}
-          </h1>
-          {weather?.icon && (
-            <img
-              src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
-              alt={weather.description}
-              className="w-24 h-24"
-            />
-          )}
-        </div>
-        {weather ? (
-          <>
-            <div className="mt-4">
-              <h2 className="text-4xl font-semibold">{weather.temp}°C</h2>
-              <p className="text-lg">Feels like {weather.feels_like}°C</p>
-              <p className="capitalize">{weather.description}</p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-              <div className="bg-emerald-50 rounded-lg p-4 shadow">
-                <h4 className="text-sm text-gray-600 mb-1">Humidity</h4>
-                <p className="text-lg font-semibold">{weather.humidity}%</p>
-              </div>
-              <div className="bg-emerald-50 rounded-lg p-4 shadow">
-                <h4 className="text-sm text-gray-600 mb-1">Wind Speed</h4>
-                <p className="text-lg font-semibold">
-                  {weather.wind_speed} m/s
-                </p>
-              </div>
-              <div className="bg-emerald-50 rounded-lg p-4 shadow">
-                <h4 className="text-sm text-gray-600 mb-1">Pressure</h4>
-                <p className="text-lg font-semibold">{weather.pressure} hPa</p>
-              </div>
-              <div className="bg-emerald-50 rounded-lg p-4 shadow">
-                <h4 className="text-sm text-gray-600 mb-1">Visibility</h4>
-                <p className="text-lg font-semibold">
-                  {weather.visibility ? weather.visibility.toFixed(1) : "N/A"}{" "}
-                  km
-                </p>
-              </div>
-            </div>
-          </>
-        ) : (
-          <p className="mt-4 text-red-600">
-            Could not load current weather data.
+    <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-white to-emerald-200 py-10 px-4">
+  <div className="max-w-5xl mx-auto backdrop-blur-sm bg-white/70 rounded-3xl shadow-2xl p-8 border border-emerald-200">
+    <div className="flex justify-between items-center mb-8">
+      <div>
+        <h1 className="text-3xl font-extrabold text-emerald-800">
+          {location.city}, {location.country}
+        </h1>
+        {weather && (
+          <p className="text-xl text-emerald-600 mt-1 capitalize">
+            {weather.description}
           </p>
         )}
       </div>
-
-      {/* Forecast Section */}
-      <div className="mt-10">
-        <div className="bg-emerald-50 rounded-lg p-6 mb-8 shadow-inner">
-          <h2 className="text-xl font-bold mb-2">Get Weather Forecast</h2>
-          <form
-            className="flex flex-wrap items-center gap-4"
-            onSubmit={handleForecastSubmit}
-          >
-            <label htmlFor="days" className="font-medium">
-              Enter number of days (1 - 6):
-            </label>
-            <input
-              type="number"
-              id="days"
-              name="days"
-              min="1"
-              max="14"
-              value={days}
-              onChange={(e) => setDays(Number(e.target.value))}
-              required
-              className="border rounded px-3 py-1 w-20"
-            />
-            <button
-              type="submit"
-              className="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700"
-              disabled={loading}
-            >
-              {loading ? "Loading..." : "Get Forecast"}
-            </button>
-          </form>
-        </div>
-
-        {forecast && forecast.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold text-emerald-700 mb-4">
-              {forecast.length}-Day Forecast
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {forecast.map((day, idx) => (
-                <div
-                  key={idx}
-                  className="bg-gradient-to-b from-gray-50 to-emerald-50 border rounded-xl p-6 shadow hover:-translate-y-1 transition"
-                >
-                  <div className="flex items-center justify-between border-b pb-2 mb-2">
-                    <h3 className="font-semibold text-lg">
-                      {typeof day.date === "string"
-                        ? new Date(day.date).toLocaleDateString(undefined, {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                          })
-                        : day.date}
-                    </h3>
-                    <img
-                      src={`https://openweathermap.org/img/wn/${day.icon}.png`}
-                      alt={day.description}
-                      className="w-12 h-12"
-                    />
-                  </div>
-                  <p className="italic text-gray-600 mb-2">{day.description}</p>
-                  <div className="flex justify-between bg-gray-100 rounded px-3 py-2 mb-2">
-                    <span className="text-red-600 font-bold">
-                      {day.max_temp}°
-                    </span>
-                    <span className="text-blue-600 font-bold">
-                      {day.min_temp}°
-                    </span>
-                  </div>
-                  <div className="text-center text-gray-700 text-sm mb-2">
-                    Avg: {day.avg_temp?.toFixed(1)}°C
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="font-medium">Wind</span>
-                      <span>{day.wind_speed ?? "N/A"} m/s</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Humidity</span>
-                      <span>{day.humidity ?? "N/A"}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Pressure</span>
-                      <span>{day.pressure ?? "N/A"} hPa</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Rain</span>
-                      <span>{day.rain ?? "0"} mm</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Sunrise</span>
-                      <span>{day.sunrise ?? "N/A"}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Sunset</span>
-                      <span>{day.sunset ?? "N/A"}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      {weather?.icon && (
+        <img
+          src={`https://openweathermap.org/img/wn/${weather.icon}@4x.png`}
+          alt={weather.description}
+          className="w-28 h-28"
+        />
+      )}
     </div>
+
+    {weather && (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <div className="bg-white bg-opacity-80 rounded-xl shadow-md p-6">
+          <h2 className="text-4xl font-bold text-emerald-700 mb-2">
+            {weather.temp}°C
+          </h2>
+          <p className="text-lg">Feels like {weather.feels_like}°C</p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: "Humidity", value: `${weather.humidity}%` },
+            { label: "Wind", value: `${weather.wind_speed} m/s` },
+            { label: "Pressure", value: `${weather.pressure} hPa` },
+            {
+              label: "Visibility",
+              value: `${weather.visibility?.toFixed(1) ?? "N/A"} km`,
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="bg-emerald-100 rounded-lg text-center p-4 border border-emerald-300"
+            >
+              <h4 className="text-sm font-semibold text-emerald-800">
+                {item.label}
+              </h4>
+              <p className="text-xl font-bold text-emerald-700">{item.value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {/* Forecast Section */}
+    <div className="mb-8">
+      <form
+        className="flex flex-wrap items-center gap-4 mb-4"
+        onSubmit={handleForecastSubmit}
+      >
+        <label htmlFor="days" className="font-medium text-emerald-800">
+          Forecast days:
+        </label>
+        <input
+          type="number"
+          id="days"
+          name="days"
+          min="1"
+          max="14"
+          value={days}
+          onChange={(e) => setDays(Number(e.target.value))}
+          className="border border-emerald-300 rounded px-3 py-1 w-24 bg-white shadow-inner"
+        />
+        <button
+          type="submit"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded shadow transition"
+        >
+          {loading ? "Loading..." : "Get Forecast"}
+        </button>
+      </form>
+    </div>
+
+    {forecast && forecast.length > 0 && (
+      <div>
+        <h2 className="text-2xl font-bold text-emerald-700 mb-6">
+          {forecast.length}-Day Forecast
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {forecast.map((day, idx) => (
+            <div
+              key={idx}
+              className="bg-white bg-opacity-80 border border-emerald-200 rounded-xl p-6 shadow-lg hover:scale-[1.02] transition-transform"
+            >
+              <div className="flex justify-between items-center mb-2 border-b pb-2">
+                <h3 className="font-semibold text-lg text-emerald-800">
+                  {new Date(day.date).toLocaleDateString(undefined, {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </h3>
+                <img
+                  src={`https://openweathermap.org/img/wn/${day.icon}.png`}
+                  alt={day.description}
+                  className="w-10 h-10"
+                />
+              </div>
+              <p className="italic text-sm text-gray-600 mb-3">
+                {day.description}
+              </p>
+              <div className="flex justify-between text-lg font-semibold">
+                <span className="text-red-600">{day.max_temp}°</span>
+                <span className="text-blue-600">{day.min_temp}°</span>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-gray-700">
+                <p>Wind: {day.wind_speed} m/s</p>
+                <p>Humidity: {day.humidity}%</p>
+                <p>Pressure: {day.pressure} hPa</p>
+                <p>Rain: {day.rain ?? "0"} mm</p>
+                <p>Sunrise: {day.sunrise}</p>
+                <p>Sunset: {day.sunset}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
   );
 };
 
