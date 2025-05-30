@@ -36,7 +36,7 @@ const AgriNews = () => {
 
   return (
     <div className="relative min-h-screen">
-      {/* Background Image */}
+      {}
       <div
         className="fixed inset-0 z-0"
         style={{

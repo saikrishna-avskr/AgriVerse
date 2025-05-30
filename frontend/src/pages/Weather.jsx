@@ -7,12 +7,10 @@ const Weather = () => {
   const [days, setDays] = useState(7);
   const [loading, setLoading] = useState(false);
 
-  // Fetch current weather and forecast
   const fetchWeather = async (forecastDays = 7) => {
     setLoading(true);
     let url = "http://127.0.0.1:8000/api/current-weather/";
     let options = {};
-    // For forecast, POST with days
     if (forecastDays !== 7) {
       options = {
         method: "POST",
@@ -22,7 +20,7 @@ const Weather = () => {
     }
     const res = await fetch(url, options);
     const data = await res.json();
-    const ctx = data.context || data; // fallback if backend changes
+    const ctx = data.context || data;  
     setWeather(ctx.current);
     setForecast(ctx.forecast || []);
     setLocation(ctx.location || {});
@@ -31,7 +29,6 @@ const Weather = () => {
 
   useEffect(() => {
     fetchWeather();
-    // eslint-disable-next-line
   }, []);
 
   const handleForecastSubmit = (e) => {

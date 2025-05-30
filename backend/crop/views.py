@@ -326,10 +326,8 @@ def generate_crop_recommendations(previous_crop, forecast_data, location, langua
 def yield_predictor(request):
     if request.method == 'POST':
         try:
-            # Load JSON request body
             data = json.loads(request.body)
 
-            # Build input DataFrame
             input_df = pd.DataFrame([{
                 'Crop': data.get('Crop'),
                 'Crop_Year': int(data.get('Crop_Year', datetime.now().year)),
@@ -342,18 +340,14 @@ def yield_predictor(request):
                 'Pesticide': float(data.get('Pesticide', 0))
             }])
 
-            # Load model and preprocessor
             base_path = os.path.join(settings.BASE_DIR, 'crop')
             model = joblib.load(os.path.join(base_path, 'crop_yield_model.joblib'))
             preprocessor = joblib.load(os.path.join(base_path, 'preprocessor.joblib'))
 
-            # Transform input using preprocessor
             input_processed = preprocessor.transform(input_df)
 
-            # Predict yield
             predicted_yield = float(model.predict(input_processed)[0])
 
-            # Generate response using Gemini
             genai.configure(api_key=settings.GEMINI_API_KEY)
             gemini_model = genai.GenerativeModel("gemini-1.5-flash")
             prompt = (
