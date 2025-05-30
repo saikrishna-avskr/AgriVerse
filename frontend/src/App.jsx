@@ -14,8 +14,6 @@ import Weather from "./pages/Weather";
 import ChatBotPage from "./pages/ChatBotPage";
 import CropGuidancePage from "./pages/CropGuidancePage";
 import HomeGrowerGuidancePage from "./pages/HomeGrowerGuidancePage";
-import Consultants from "./pages/Consultants"; 
-import ConsultantForm from "./pages/ConsultantForm"; 
 // import Navbar from "./components/Navbar"; 
 import {
   SignedIn,
@@ -56,8 +54,6 @@ function App() {
           <Route path="/weather" element={<Weather />} />
           <Route path="/chatbot" element={<ChatBotPage />} />
           <Route path="/disease-detection" element={<DiseaseDetectionPage />} />
-          <Route path="/consultants" element={<Consultants />} /> 
-          <Route path="/be-consultant" element={<ConsultantForm />} />
         </Routes>
       </SignedIn>
 <SignedOut>
