@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'crop',
     'chat',
     'corsheaders',
+    'consultants',
     'rest_framework.authtoken'
 ]
 

@@ -21,9 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('crop.urls')),
     path('api/', include('chat.urls')),
+    path('api/', include('consultants.urls')),
 ]
-from rest_framework.authtoken.views import obtain_auth_token
 
-urlpatterns += [
-    path('api/login/', obtain_auth_token, name='api_token_auth'),
-]

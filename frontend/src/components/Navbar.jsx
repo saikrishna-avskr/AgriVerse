@@ -14,6 +14,7 @@ const Navbar = () => {
       <div className="navbar-links">
         <Link to="/promotions" className="navbar-link">MarketPlace</Link>
         <Link to="/AgroMarket" className="navbar-link">Agro Marketplace</Link>
+        <Link to="/consultants" className="navbar-link">Consulatation</Link>
         <Link to="/notifications" className="navbar-link">🔔</Link>
         <Link to="/dashboard" className="navbar-link">👤</Link>
         <Link to="/chatbot" className="navbar-link">ChatBot</Link>
