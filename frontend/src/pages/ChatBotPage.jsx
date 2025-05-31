@@ -5,8 +5,10 @@ import "./ChatBot.css";
 import { useAuth, useUser, SignIn, SignOutButton } from "@clerk/clerk-react";
 import Navbar from "../components/Navbar";
 
+// Base URL for backend API
 const API_BASE = "http://localhost:8000/api";
 
+// Helper to get Axios config with auth token
 const getAxiosConfig = async () => {
   const { getToken } = useAuth();
   const token = await getToken({ template: "updated" });
@@ -19,26 +21,28 @@ const getAxiosConfig = async () => {
 };
 
 export default function ChatBotPage() {
+  // Clerk authentication and user info
   const { isSignedIn, getToken } = useAuth();
   const { user } = useUser();
 
-  const [message, setMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState([]);
-  const [sessions, setSessions] = useState([]);
-  const [activeSession, setActiveSession] = useState(null);
-  const [editingSessionId, setEditingSessionId] = useState(null);
-  const [newTitle, setNewTitle] = useState("");
-  const [ttsEnabled, setTtsEnabled] = useState(true);
-  const [voices, setVoices] = useState([]);
-  const [selectedVoice, setSelectedVoice] = useState(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [audioChunks, setAudioChunks] = useState([]);
-  const [sending, setSending] = useState(false);
-  const [awaitingPhoneNumber, setAwaitingPhoneNumber] = useState(false);
-  const [location, setLocation] = useState({ latitude: null, longitude: null });
+  // State variables for chat, sessions, TTS, and audio recording
+  const [message, setMessage] = useState(""); // Current input message
+  const [chatHistory, setChatHistory] = useState([]); // Messages in current chat
+  const [sessions, setSessions] = useState([]); // All chat sessions
+  const [activeSession, setActiveSession] = useState(null); // Current session ID
+  const [editingSessionId, setEditingSessionId] = useState(null); // Session being renamed
+  const [newTitle, setNewTitle] = useState(""); // New session title
+  const [ttsEnabled, setTtsEnabled] = useState(true); // Text-to-speech toggle
+  const [voices, setVoices] = useState([]); // Available TTS voices
+  const [selectedVoice, setSelectedVoice] = useState(null); // Selected TTS voice
+  const [isRecording, setIsRecording] = useState(false); // Audio recording state
+  const [mediaRecorder, setMediaRecorder] = useState(null); // MediaRecorder instance
+  const [audioChunks, setAudioChunks] = useState([]); // Audio data chunks
+  const [sending, setSending] = useState(false); // Sending message state
+  const [awaitingPhoneNumber, setAwaitingPhoneNumber] = useState(false); // If bot asks for phone number
+  const [location, setLocation] = useState({ latitude: null, longitude: null }); // User's geolocation
 
-  // Get location on mount
+  // On mount: Get user's geolocation (if available)
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -55,7 +59,7 @@ export default function ChatBotPage() {
     }
   }, []);
 
-  // Load voices for TTS
+  // On mount: Load available voices for TTS
   useEffect(() => {
     const loadVoices = () => {
       const availableVoices = window.speechSynthesis.getVoices();
@@ -70,13 +74,14 @@ export default function ChatBotPage() {
     }
   }, [selectedVoice]);
 
-  // Fetch sessions when signed in
+  // When signed in, fetch chat sessions from backend
   useEffect(() => {
     if (isSignedIn) {
       fetchSessions();
     }
   }, [isSignedIn]);
 
+  // Fetch all chat sessions for the user
   const fetchSessions = async () => {
     const token = await getToken({ template: "updated" });
     console.log("Fetching sessions with token:", token);
@@ -88,6 +93,7 @@ export default function ChatBotPage() {
     }
   };
 
+  // Fetch chat history for a given session
   const fetchChatHistory = async (sessionId) => {
     const token = await getToken({ template: "updated" });
     const res = await fetch(`${API_BASE}/chat/${sessionId}/`, {
@@ -98,6 +104,7 @@ export default function ChatBotPage() {
     }
   };
 
+  // Send a message to the bot and update chat history
   const handleSend = async () => {
     if (!message.trim() || !activeSession) return;
     setSending(true);
@@ -126,6 +133,7 @@ export default function ChatBotPage() {
     setSending(false);
   };
 
+  // Create a new chat session
   const handleNewSession = async () => {
     try {
       const token = await getToken({ template: "updated" });
@@ -143,11 +151,13 @@ export default function ChatBotPage() {
     }
   };
 
+  // Start editing a session title
   const startEditing = (id, currentTitle) => {
     setEditingSessionId(id);
     setNewTitle(currentTitle);
   };
 
+  // Save the new session title to backend
   const saveTitle = async (id) => {
     if (!newTitle.trim()) {
       alert("Title cannot be empty");
@@ -167,6 +177,7 @@ export default function ChatBotPage() {
     }
   };
 
+  // Delete a chat session
   const handleDeleteSession = async (id) => {
     if (!window.confirm("Are you sure you want to delete this chat?")) return;
     try {
@@ -184,6 +195,7 @@ export default function ChatBotPage() {
     }
   };
 
+  // Audio recording effect: handles starting/stopping and sending audio to backend
   useEffect(() => {
     let recorder;
     let stream;
@@ -215,12 +227,14 @@ export default function ChatBotPage() {
         });
     }
 
+    // Cleanup: stop recording and release resources
     return () => {
       if (recorder?.state === "recording") recorder.stop();
       if (stream) stream.getTracks().forEach((track) => track.stop());
     };
   }, [isRecording]);
 
+  // Send recorded audio to backend for speech-to-text
   const sendAudioToRevUp = async (audioBlob) => {
     try {
       const config = await getAxiosConfig();
@@ -246,6 +260,7 @@ export default function ChatBotPage() {
     }
   };
 
+  // Toggle audio recording state
   const toggleRecording = () => {
     if (isRecording) {
       mediaRecorder?.stop();
@@ -255,12 +270,17 @@ export default function ChatBotPage() {
     }
   };
 
+  // If not signed in, show sign-in page
   if (!isSignedIn) {
     return <SignIn />;
   }
 
+  // =========================
+  // Render ChatBot UI
+  // =========================
   return (
     <div className="app">
+      {/* Sidebar: Chat sessions list and controls */}
       <div className="sidebar">
         <h3>Chats</h3>
         <button onClick={handleNewSession} disabled={sending}>
@@ -270,6 +290,7 @@ export default function ChatBotPage() {
           {sessions.map((s) => (
             <li key={s.id} className={s.id === activeSession ? "active" : ""}>
               <div className="chat-session-item">
+                {/* Session title: editable on double click */}
                 {editingSessionId === s.id ? (
                   <input
                     value={newTitle}
@@ -294,6 +315,7 @@ export default function ChatBotPage() {
                   </span>
                 )}
 
+                {/* Delete session button */}
                 <button
                   onClick={() => handleDeleteSession(s.id)}
                   disabled={sending}
@@ -301,6 +323,7 @@ export default function ChatBotPage() {
                   className="delete-button"
                   style={{ margin: "auto" }}
                 >
+                  {/* Trash icon SVG */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
@@ -325,8 +348,10 @@ export default function ChatBotPage() {
         </ul>
       </div>
 
+      {/* Main chat area */}
       <div className="chat-container">
         <Navbar />
+        {/* Chat history display */}
         <div className="chat-history">
           {chatHistory.map((msg, idx) => (
             <div
@@ -338,6 +363,7 @@ export default function ChatBotPage() {
           ))}
         </div>
 
+        {/* Chat input area */}
         <div className="chat-input">
           <input
             type="text"

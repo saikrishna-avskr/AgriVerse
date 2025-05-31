@@ -5,11 +5,13 @@ import hgui1 from "../assets/hgui1.png";
 import hgui2 from "../assets/hgui2.png";
 import hgui3 from "../assets/hgui3.png";
 
+// Helper: Generate an Amazon affiliate link for a given tool/item name
 const affiliateLink = (toolName) => {
   const query = encodeURIComponent(toolName);
   return `https://www.amazon.in/s?k=${query}`;
 };
 
+// Helper: Convert [item] in text to clickable affiliate links
 const convertToAffiliateLinks = (text) => {
   return text.replace(/\[([^\]]+)\]/g, (_, item) => {
     const url = affiliateLink(item);
@@ -18,15 +20,20 @@ const convertToAffiliateLinks = (text) => {
 };
 
 const Terrace = () => {
+  // State for showing/hiding the home grower form
   const [showForm, setShowForm] = useState(false);
+  // State for selected DIY and smart gardening options
   const [diyOption, setDiyOption] = useState("");
   const [diyResponse, setDiyResponse] = useState("");
   const [smartOption, setSmartOption] = useState("");
   const [smartResponse, setSmartResponse] = useState("");
 
-  const GEMINI_API_KEY = "AIzaSyA9Ggk7lKD5X-9iNERVRedeT3MH7_XKjbs"; // Replace with env var in production
+  // Gemini API key (should be stored securely in production)
+  const GEMINI_API_KEY = "AIzaSyA9Ggk7lKD5X-9iNERVRedeT3MH7_XKjbs";
 
+  // Function to generate step-by-step implementation for a gardening idea
   const generateImplementation = async (idea, type) => {
+    // Prompt for Gemini API: asks for plain, step-by-step instructions
     const prompt = `
 You are an expert gardening assistant.
 
@@ -39,6 +46,7 @@ Give a clear, step-by-step implementation plan for the idea: "${idea}" suitable 
 Return the response as plain, numbered steps or concise instructions. No need for decoration—just helpful, structured guidance.
 `;
 
+    // Call Gemini API with the prompt
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" +
         GEMINI_API_KEY,
@@ -51,6 +59,7 @@ Return the response as plain, numbered steps or concise instructions. No need fo
       }
     );
 
+    // Parse the response and update the appropriate state
     const data = await response.json();
     const text =
       data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
@@ -59,6 +68,7 @@ Return the response as plain, numbered steps or concise instructions. No need fo
 
   return (
     <div className="bg-gradient-to-b from-green-100 to-emerald-200 min-h-screen p-6 md:p-12">
+      {/* Page Title */}
       <h2 className="text-4xl font-bold text-center text-emerald-800 mb-10 drop-shadow-sm">
         🌿 HomeGrower's Paradise: Terrace Gardening Guide
       </h2>
@@ -76,7 +86,7 @@ Return the response as plain, numbered steps or concise instructions. No need fo
         </p>
       </div>
 
-      {/* DIY Techniques */}
+      {/* DIY Techniques Section */}
       <section className="mb-10 bg-white/90 backdrop-blur-md p-6 md:p-10 rounded-3xl shadow-md">
         <h3 className="text-2xl font-semibold text-emerald-700 mb-4">
           🛠️ DIY Gardening Techniques
@@ -87,6 +97,7 @@ Return the response as plain, numbered steps or concise instructions. No need fo
           <li>Design a budget-friendly drip irrigation system with bottles</li>
         </ul>
 
+        {/* Dropdown to select a DIY idea */}
         <label className="block text-emerald-800 font-medium mb-2">
           Select an idea to get implementation guidance:
         </label>
@@ -112,6 +123,7 @@ Return the response as plain, numbered steps or concise instructions. No need fo
           <option value="custom">Your own idea</option>
         </select>
 
+        {/* Custom DIY idea input */}
         {diyOption === "custom" && (
           <input
             type="text"
@@ -122,6 +134,7 @@ Return the response as plain, numbered steps or concise instructions. No need fo
           />
         )}
 
+        {/* Show DIY response with affiliate links */}
         {diyResponse && (
           <div
             className="bg-emerald-50 p-4 rounded-lg shadow text-gray-800 whitespace-pre-wrap"
@@ -132,7 +145,7 @@ Return the response as plain, numbered steps or concise instructions. No need fo
         )}
       </section>
 
-      {/* Smart Gardening Tips */}
+      {/* Smart Gardening Tips Section */}
       <section className="mb-10 bg-white/90 backdrop-blur-md p-6 md:p-10 rounded-3xl shadow-md">
         <h3 className="text-2xl font-semibold text-emerald-700 mb-4">
           ♻️ Sustainable & Smart Gardening Tips
@@ -143,6 +156,7 @@ Return the response as plain, numbered steps or concise instructions. No need fo
           lush and sustainable.
         </p>
 
+        {/* Dropdown to select a sustainability tip */}
         <label className="block text-emerald-800 font-medium mb-2">
           Select a sustainable idea to get implementation guidance:
         </label>
@@ -161,6 +175,7 @@ Return the response as plain, numbered steps or concise instructions. No need fo
           <option value="custom">Your own idea</option>
         </select>
 
+        {/* Custom sustainability idea input */}
         {smartOption === "custom" && (
           <input
             type="text"
@@ -171,6 +186,7 @@ Return the response as plain, numbered steps or concise instructions. No need fo
           />
         )}
 
+        {/* Show smart gardening response with affiliate links */}
         {smartResponse && (
           <div
             className="bg-emerald-50 p-4 rounded-lg shadow text-gray-800 whitespace-pre-wrap"
@@ -181,10 +197,10 @@ Return the response as plain, numbered steps or concise instructions. No need fo
         )}
       </section>
 
-      {/* Success Stories */}
+      {/* Success Stories Section */}
       <SuccessStories />
 
-      {/* Form Trigger */}
+      {/* Button to show/hide the home grower guidance form */}
       <div className="text-center mb-10">
         <button
           onClick={() => setShowForm(!showForm)}
@@ -194,14 +210,14 @@ Return the response as plain, numbered steps or concise instructions. No need fo
         </button>
       </div>
 
-      {/* Conditional Form */}
+      {/* Conditional rendering of the home grower guidance form */}
       {showForm && (
         <div className="mt-4 mb-10">
           <HomeGrowerGuidanceForm />
         </div>
       )}
 
-      {/* New Image Row at Bottom */}
+      {/* Decorative images at the bottom */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10">
         {[hgui1, hgui2, hgui3].map((img, i) => (
           <img
