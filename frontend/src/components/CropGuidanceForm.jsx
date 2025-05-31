@@ -1,6 +1,46 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 
+/**
+ * CropGuidanceChatbot is a conversational React component that guides users through a series of questions
+ * to collect farm and environmental data, then provides personalized crop recommendations.
+ *
+ * Features:
+ * - Step-by-step chat interface for collecting user inputs (region, soil type, season, etc.)
+ * - Quick reply buttons for multiple-choice questions
+ * - Editable answers after completion, allowing users to update any field
+ * - Calls a backend API for crop guidance, with a local fallback if the API fails
+ * - Injects Amazon product links for relevant keywords in the guidance
+ * - Displays results using Markdown formatting
+ *
+ * State:
+ * - formData: Object holding all user responses for each field
+ * - chatHistory: Array of chat messages (assistant/user)
+ * - currentInput: Current text input from the user
+ * - currentQuestion: The field currently being asked
+ * - isSubmitting: Boolean indicating if the API call is in progress
+ * - isComplete: Boolean indicating if the consultation is finished
+ * - result: The generated crop guidance (Markdown)
+ *
+ * Helper Functions:
+ * - handleSubmit: Processes user input, advances the chat, and triggers API/local guidance generation
+ * - handleQuickReply: Handles quick reply button selection
+ * - handleKeyPress: Submits input on Enter key
+ * - handleEditField: Allows editing of a specific field after completion
+ * - checkForEditRequest: Parses user input to detect edit requests
+ * - injectProductLinks: Replaces keywords in the guidance with Amazon product links
+ * - generateGuidance: Generates a sample crop guidance locally if API is unavailable
+ *
+ * UI:
+ * - Chat interface with assistant and user messages
+ * - Quick reply options for certain questions
+ * - Input box for free text answers
+ * - Result display with Markdown rendering and product links
+ * - Buttons to start a new consultation or edit information
+ *
+ * @component
+ * @returns {JSX.Element} The CropGuidanceChatbot chat interface and crop guidance result.
+ */
 export default function CropGuidanceChatbot() {
   // State for form data
   const [formData, setFormData] = useState({

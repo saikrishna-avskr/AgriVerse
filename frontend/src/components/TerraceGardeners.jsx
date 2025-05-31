@@ -1,30 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+// TerraceGardeners component displays a slideshow with gardening tips and inspiration
 const TerraceGardeners = () => {
-  const navigate = useNavigate();
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate(); // Hook for navigation
+  const [currentSlide, setCurrentSlide] = useState(0); // State to track current slide index
 
+  // Handle click on slideshow to navigate to /terrace route
   const handleClick = () => {
     navigate('/terrace');
   };
 
+  // Automatically switch slides every 3 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide(prev => (prev === 0 ? 1 : 0));
-    }, 3000); // 3 seconds interval
+      setCurrentSlide(prev => (prev === 0 ? 1 : 0)); // Toggle between slides
+    }, 3000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
 
+  // Array of slide data: image, title, and content
   const slides = [
     {
-      image: '/src/assets/ter4.jpg', // Replace with actual path
+      image: '/src/assets/ter4.jpg', // Path to first slide image
       title: "🌿 Homegrower's Hub",
       content: "Discover tools, tips & smart DIY setups to start your own garden from your balcony, rooftop, or backyard. Transform your space into a green paradise and embrace sustainable living with our comprehensive gardening solutions."
     },
     {
-      image: '/src/assets/hgui1.png', // Replace with actual path
+      image: '/src/assets/hgui1.png', // Path to second slide image
       title: "HomeGrower's Paradise",
       content: (
         <div className="tips-content">
@@ -46,15 +50,18 @@ const TerraceGardeners = () => {
   ];
 
   return (
+    // Slideshow container, navigates to /terrace on click
     <div className="slideshow-container" onClick={handleClick}>
+      {/* Render each slide; only the active slide is visible */}
       {slides.map((slide, index) => (
         <div
           key={index}
           className={`slide ${index === currentSlide ? 'active' : ''}`}
         >
           <div className="slide-background">
+            {/* Slide image */}
             <img src={slide.image} alt={`Slide ${index + 1}`} className="slide-image" />
-            <div className="overlay"></div>
+            <div className="overlay"></div> {/* Dark overlay for readability */}
           </div>
           <div className="slide-content">
             <div className="content-card">
@@ -67,6 +74,7 @@ const TerraceGardeners = () => {
         </div>
       ))}
       
+      {/* Slide indicators (dots) */}
       <div className="slide-indicators">
         {slides.map((_, index) => (
           <div
@@ -76,6 +84,7 @@ const TerraceGardeners = () => {
         ))}
       </div>
       
+      {/* Inline CSS for component styling */}
       <style jsx>{`
         .slideshow-container {
           position: relative;
@@ -211,6 +220,7 @@ const TerraceGardeners = () => {
           }
         }
 
+        /* Responsive styles for tablets */
         @media (max-width: 768px) {
           .slideshow-container {
             height: 400px;
@@ -230,6 +240,7 @@ const TerraceGardeners = () => {
           }
         }
 
+        /* Responsive styles for mobile */
         @media (max-width: 480px) {
           .slideshow-container {
             height: 350px;

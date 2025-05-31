@@ -7,6 +7,17 @@ class ChatMessageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ChatSessionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the ChatSession model.
+
+    Serializes the following fields:
+        - id: Unique identifier for the chat session.
+        - title: Title or name of the chat session.
+        - created_at: Timestamp indicating when the chat session was created.
+        - messages: List of related chat messages, serialized using ChatMessageSerializer (read-only).
+
+    The 'messages' field is nested and read-only, ensuring that messages can be viewed but not modified through this serializer.
+    """
     messages = ChatMessageSerializer(many=True, read_only=True)
 
     class Meta:

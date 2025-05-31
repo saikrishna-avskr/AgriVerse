@@ -1,6 +1,45 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 
+/**
+ * HomeGrowerGuidanceChatbot
+ * 
+ * A conversational React component that guides home gardeners through a series of questions
+ * to collect information about their gardening space, preferences, and experience. 
+ * Based on the user's responses, it generates personalized gardening advice and plant suggestions.
+ * 
+ * Features:
+ * - Step-by-step chat interface with assistant and user messages.
+ * - Quick reply options for certain questions.
+ * - Handles user input, including editing previous answers.
+ * - Calls an API for guidance, with a local fallback if the API fails.
+ * - Displays a personalized garden plan upon completion.
+ * 
+ * State:
+ * - formData: Object containing all user responses.
+ * - chatHistory: Array of chat messages (assistant/user).
+ * - currentInput: Current text input from the user.
+ * - currentQuestion: Key of the current question being asked.
+ * - isSubmitting: Boolean indicating if the API call is in progress.
+ * - isComplete: Boolean indicating if the chat is finished and advice is shown.
+ * - result: The generated gardening advice (Markdown).
+ * 
+ * Functions:
+ * - handleSubmit: Processes user input and advances the chat.
+ * - handleQuickReply: Handles quick reply button selection.
+ * - handleKeyPress: Submits input on Enter key.
+ * - handleEditField: Allows user to edit a previous answer.
+ * - checkForEditRequest: Parses input to detect edit requests.
+ * - generateGuidance: Generates gardening advice based on formData.
+ * 
+ * UI:
+ * - Chat window with scrolling history.
+ * - Quick reply buttons for select questions.
+ * - Input area for user responses.
+ * - Displays personalized advice after completion.
+ * 
+ * @component
+ */
 export default function HomeGrowerGuidanceChatbot() {
   // State for form data
   const [formData, setFormData] = useState({

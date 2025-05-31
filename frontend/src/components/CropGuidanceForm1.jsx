@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 
+// CropGuidanceForm: Main component for the AI Crop Guidance form
 export default function CropGuidanceForm() {
+  // State to hold all form input values
   const [formData, setFormData] = useState({
     region: "",
     latlong: "",
@@ -24,13 +26,16 @@ export default function CropGuidanceForm() {
     land_size: "",
   });
 
+  // State to hold the result returned from the API
   const [result, setResult] = useState("");
 
+  // Handle input changes and update formData state
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle form submission: send data to backend and update result
   const handleSubmit = async (e) => {
     e.preventDefault();
     setResult("Loading...");
@@ -50,14 +55,17 @@ export default function CropGuidanceForm() {
 
   return (
     <div className="min-h-screen bg-green-50 flex flex-col items-center py-8 px-4">
+      {/* Page Title */}
       <h1 className="text-3xl font-bold text-green-700 mb-6">
         AI Crop Guidance Form
       </h1>
+      {/* Main Form */}
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-2xl shadow-md w-full max-w-4xl space-y-4"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Region/Location Inputs */}
           <input
             className="p-2 border rounded-xl"
             name="region"
@@ -73,6 +81,7 @@ export default function CropGuidanceForm() {
             value={formData.latlong}
           />
 
+          {/* Soil Type Selection */}
           <select
             className="p-2 border rounded-xl"
             name="soil_type"
@@ -87,6 +96,7 @@ export default function CropGuidanceForm() {
             <option>Peaty</option>
             <option>Saline</option>
           </select>
+          {/* Soil pH Input */}
           <input
             className="p-2 border rounded-xl"
             name="soil_ph"
@@ -95,6 +105,7 @@ export default function CropGuidanceForm() {
             value={formData.soil_ph}
           />
 
+          {/* Soil Moisture and NPK Inputs */}
           <input
             className="p-2 border rounded-xl"
             name="moisture"
@@ -110,6 +121,7 @@ export default function CropGuidanceForm() {
             value={formData.npk}
           />
 
+          {/* Season and Rainfall Selection */}
           <select
             className="p-2 border rounded-xl"
             name="season"
@@ -133,6 +145,7 @@ export default function CropGuidanceForm() {
             <option>Heavy</option>
           </select>
 
+          {/* Temperature and Humidity Inputs */}
           <input
             className="p-2 border rounded-xl"
             name="temperature"
@@ -148,6 +161,7 @@ export default function CropGuidanceForm() {
             value={formData.humidity}
           />
 
+          {/* Sunlight Input */}
           <input
             className="p-2 border rounded-xl"
             name="sunlight"
@@ -156,6 +170,7 @@ export default function CropGuidanceForm() {
             value={formData.sunlight}
           />
 
+          {/* Previous Crop and Harvest Date Inputs */}
           <input
             className="p-2 border rounded-xl"
             name="previous_crop"
@@ -172,6 +187,7 @@ export default function CropGuidanceForm() {
             value={formData.harvest_date}
           />
 
+          {/* Irrigation Type Selection */}
           <select
             className="p-2 border rounded-xl"
             name="irrigation"
@@ -184,6 +200,7 @@ export default function CropGuidanceForm() {
             <option>Canal</option>
             <option>Rainfed</option>
           </select>
+          {/* Fertilizer Input */}
           <input
             className="p-2 border rounded-xl"
             name="fertilizer"
@@ -192,6 +209,7 @@ export default function CropGuidanceForm() {
             value={formData.fertilizer}
           />
 
+          {/* Equipment, Crop Type, Market, and Land Size Inputs */}
           <input
             className="p-2 border rounded-xl"
             name="equipment"
@@ -223,6 +241,7 @@ export default function CropGuidanceForm() {
           />
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
           className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-xl w-full mt-4"
@@ -231,6 +250,7 @@ export default function CropGuidanceForm() {
         </button>
       </form>
 
+      {/* Display AI Guidance Result */}
       {result && (
         <div className="mt-6 bg-white p-6 rounded-2xl shadow-md w-full max-w-4xl">
           <h2 className="text-xl font-bold text-green-700 mb-2">

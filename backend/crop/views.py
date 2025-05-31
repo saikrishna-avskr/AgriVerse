@@ -13,7 +13,7 @@ import pandas as pd
 import os
 import base64
 
-
+# View to predict crop disease from an uploaded image using Gemini API
 @csrf_exempt
 def predict_disease_view(request):
     if request.method == 'POST' and request.FILES.get('image'):
@@ -21,6 +21,7 @@ def predict_disease_view(request):
             image_file = request.FILES['image']
             image_bytes = image_file.read()
             language = request.POST.get('Language', 'english')
+            # Prompt for Gemini model to analyze the image and provide diagnosis and advice
             prompt = f"""
             This is a photo of a crop leaf. Identify:
             1. Whether the leaf is healthy or diseased.
@@ -34,6 +35,7 @@ def predict_disease_view(request):
             - Solution: (Treatment recommendation)
             - Prevention Tips: (To avoid recurrence)
             """
+            # Call Gemini API with image and prompt
             response = client.models.generate_content(
                 model='gemini-2.0-flash',
                 contents=[
@@ -43,6 +45,7 @@ def predict_disease_view(request):
                 ),prompt
                 ]
             )
+            # Encode image to base64 for frontend display
             image_base64 = base64.b64encode(image_bytes).decode('utf-8')
             return JsonResponse({'result': response.text,'image': image_base64}, status=200)
         except Exception as e:
@@ -50,11 +53,13 @@ def predict_disease_view(request):
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'POST an image file.'}, status=400)
 
+# View to provide crop guidance based on farm and environmental parameters
 @csrf_exempt
 def farmer_crop_guidance(request):
     if request.method == 'POST':
         data = json.loads(request.body)
 
+        # Prompt for Gemini model to suggest crops and cultivation plan
         prompt = f"""
         Based on the following parameters, suggest the most suitable crops and a brief cultivation plan:
 
@@ -88,11 +93,13 @@ def farmer_crop_guidance(request):
         return JsonResponse({"guidance": response.text})
     return JsonResponse({"error": "POST required fields."}, status=400)
 
+# View to provide home gardening guidance for beginners
 @csrf_exempt
 def home_garden_guidance(request):
     if request.method == 'POST':
         data = json.loads(request.body)
 
+        # Prompt for Gemini model to suggest easy plants and care tips
         prompt = f"""
         I am a beginner/home gardener. Based on the following inputs, suggest easy-to-grow plants, vegetables, or fruits and simple guidance:
 
@@ -119,7 +126,6 @@ def home_garden_guidance(request):
         return JsonResponse({"guidance": response.text})
     return JsonResponse({"error": "POST required fields."}, status=400)
 
-
 from django.shortcuts import render
 import geocoder
 import requests
@@ -133,19 +139,24 @@ from sklearn.pipeline import Pipeline
 from django.http import JsonResponse
 import os
 
+# View to fetch current and forecast weather data based on user's IP location
 @csrf_exempt
 def current_weather(request):
     try:
+        # Get user's approximate location using IP
         g = geocoder.ip('me')
         latlng = g.latlng if g.ok else [27.0238, 74.2179]
         
+        # Fetch current weather data
         current_data = get_weather_data(latlng[0], latlng[1]) if latlng else None
         forecast_data = None
         
+        # If forecast requested, fetch forecast data (up to 14 days)
         if request.method == 'POST' and 'days' in request.POST:
             days = min(int(request.POST.get('days')), 14)   
             forecast_data = get_weekly_weather(latlng[0], latlng[1], settings.OPENWEATHER_API_KEY, days)
         
+        # Prepare context for response
         context = {
             'current': process_current_data(current_data) if current_data else None,
             'forecast': process_forecast_data(forecast_data) if forecast_data else None,
@@ -162,6 +173,7 @@ def current_weather(request):
         print(f"Error: {str(e)}")
         return JsonResponse({'error': f"Failed to fetch weather data: {str(e)}"}, status=500)
 
+# Helper to fetch current weather from OpenWeatherMap API
 def get_weather_data(lat, lon):
     try:
         response = requests.get(
@@ -180,6 +192,7 @@ def get_weather_data(lat, lon):
         print(f"Weather API Error: {str(e)}")
         return None
 
+# Helper to fetch forecast weather data for given days
 def get_weekly_weather(lat, lon, api_key, days=7):
     try:
         response = requests.get(
@@ -189,7 +202,7 @@ def get_weekly_weather(lat, lon, api_key, days=7):
                 'lon': lon,
                 'appid': api_key,
                 'units': 'metric',
-                'cnt': days*8   
+                'cnt': days*8   # 8 intervals per day (3-hourly)
             },
             timeout=15
         )
@@ -199,6 +212,7 @@ def get_weekly_weather(lat, lon, api_key, days=7):
         print(f"Forecast Error: {e}")
         return None
 
+# Helper to process current weather data into readable format
 def process_current_data(data):
     x={
         'temp': data['main']['temp'],
@@ -216,6 +230,7 @@ def process_current_data(data):
     print("x",x)
     return x
 
+# Helper to process forecast data into daily summaries
 def process_forecast_data(data):
     daily_data = {}
     for item in data['list']:
@@ -236,6 +251,7 @@ def process_forecast_data(data):
                 'sunset': None
             }
         
+        # Aggregate weather metrics for each day
         daily_data[date]['temps'].append(item['main']['temp'])
         daily_data[date]['feels_like'].append(item['main']['feels_like'])
         daily_data[date]['descriptions'].append(item['weather'][0]['description'])
@@ -247,12 +263,14 @@ def process_forecast_data(data):
         daily_data[date]['rain'].append(item.get('rain', {}).get('3h', 0))
         daily_data[date]['clouds'].append(item.get('clouds', {}).get('all', 0))
         
+        # Set sunrise/sunset if available
         if 'city' in data and 'sunrise' in data['city']:
             daily_data[date]['sunrise'] = datetime.fromtimestamp(data['city']['sunrise']).strftime('%H:%M')
             daily_data[date]['sunset'] = datetime.fromtimestamp(data['city']['sunset']).strftime('%H:%M')
     
     processed = []
     for date, values in daily_data.items():
+        # Summarize daily weather
         processed.append({
             'date': date,
             'max_temp': max(values['temps']),
@@ -274,7 +292,7 @@ def process_forecast_data(data):
     print("processed",processed)
     return processed
 
-
+# View to provide crop rotation recommendations based on previous crop and weather forecast
 @csrf_exempt
 def crop_rotation(request):
     if request.method == 'POST':
@@ -286,7 +304,9 @@ def crop_rotation(request):
             g = geocoder.ip('me')
             latlng = g.latlng if g.ok else [17.384, 78.4564]
             location = g.city if g.ok else "Hyderabad"
+            # Fetch 90-day weather forecast
             forecast_data = get_weekly_weather(latlng[0], latlng[1], settings.OPENWEATHER_API_KEY, days)
+            # Generate recommendations using Gemini
             recommendations = generate_crop_recommendations(
                 previous_crop,
                 forecast_data,
@@ -298,6 +318,7 @@ def crop_rotation(request):
             return JsonResponse({'error': f"Failed to generate crop recommendations: {str(e)}"}, status=500)
     return JsonResponse({'error': 'POST required.'}, status=400)
 
+# Helper to generate crop rotation recommendations using Gemini API
 def generate_crop_recommendations(previous_crop, forecast_data, location, language):
     try:
         genai.configure(api_key=settings.GEMINI_API_KEY)
@@ -321,13 +342,14 @@ def generate_crop_recommendations(previous_crop, forecast_data, location, langua
         print(f"Gemini API Error: {str(e)}")
         return f"Could not generate recommendations. Please try again later.\n{str(e)}"
     
+# View to predict crop yield using a trained ML model and Gemini for explanation
 @csrf_exempt
-
 def yield_predictor(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
 
+            # Prepare input dataframe for ML model
             input_df = pd.DataFrame([{
                 'Crop': data.get('Crop'),
                 'Crop_Year': int(data.get('Crop_Year', datetime.now().year)),
@@ -340,14 +362,16 @@ def yield_predictor(request):
                 'Pesticide': float(data.get('Pesticide', 0))
             }])
 
+            # Load ML model and preprocessor
             base_path = os.path.join(settings.BASE_DIR, 'crop')
             model = joblib.load(os.path.join(base_path, 'crop_yield_model.joblib'))
             preprocessor = joblib.load(os.path.join(base_path, 'preprocessor.joblib'))
 
+            # Transform input and predict yield
             input_processed = preprocessor.transform(input_df)
-
             predicted_yield = float(model.predict(input_processed)[0])
 
+            # Use Gemini to generate a user-friendly explanation
             genai.configure(api_key=settings.GEMINI_API_KEY)
             gemini_model = genai.GenerativeModel("gemini-1.5-flash")
             prompt = (
@@ -371,7 +395,7 @@ def yield_predictor(request):
 
     return JsonResponse({'success': False, 'error': 'POST required.'}, status=400)
 
-
+# View to generate agriculture news summary and reputable sources using Gemini
 @csrf_exempt
 def agri_news(request):
     if request.method == 'POST':
@@ -383,6 +407,7 @@ def agri_news(request):
             genai.configure(api_key=settings.GEMINI_API_KEY)
             model = genai.GenerativeModel("gemini-1.5-flash")
 
+            # Prompt for news summary
             prompt = f"""
 You are an {language} expert agriculture news summarizer.
 
@@ -411,6 +436,7 @@ Note: don't include any disclaimers or unnecessary information. like html
             response = model.generate_content(prompt)
             news_summary = response.text.replace('•', '<br>•')
             
+            # Prompt for reputable news sources
             prompt = f"""
 You are an {language} expert agriculture news summarizer.
 

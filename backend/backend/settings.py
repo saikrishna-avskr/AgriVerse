@@ -15,14 +15,11 @@ from google import genai
 import os
 from dotenv import load_dotenv
 
+# Load environment variables from a .env file
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-9mm3xuea!fl()8klj#*$_s2#f8mn!h-b!(c=gyn09m8c6he*i!'
@@ -30,61 +27,60 @@ SECRET_KEY = 'django-insecure-9mm3xuea!fl()8klj#*$_s2#f8mn!h-b!(c=gyn09m8c6he*i!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Hosts/domain names that are valid for this site
 ALLOWED_HOSTS = []
 
-
 # Application definition
-
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'crop',
-    'chat',
-    'corsheaders',
-    'consultants',
-    'rest_framework.authtoken'
+    'django.contrib.admin',                # Admin site
+    'django.contrib.auth',                 # Authentication framework
+    'django.contrib.contenttypes',         # Content type system
+    'django.contrib.sessions',             # Session framework
+    'django.contrib.messages',             # Messaging framework
+    'django.contrib.staticfiles',          # Static file management
+    'rest_framework',                      # Django REST framework
+    'crop',                                # Custom crop app
+    'chat',                                # Custom chat app
+    'corsheaders',                         # CORS headers for cross-origin requests
+    'consultants',                         # Custom consultants app
+    'rest_framework.authtoken'             # Token authentication for DRF
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'django.middleware.security.SecurityMiddleware',           # Security enhancements
+    'django.contrib.sessions.middleware.SessionMiddleware',    # Session management
+    'django.middleware.common.CommonMiddleware',               # Common HTTP features
+    'django.middleware.csrf.CsrfViewMiddleware',               # CSRF protection
+    'django.contrib.auth.middleware.AuthenticationMiddleware', # Authentication
+    'django.contrib.messages.middleware.MessageMiddleware',    # Messaging
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Clickjacking protection
+    'corsheaders.middleware.CorsMiddleware',                   # CORS middleware
+    'django.middleware.common.CommonMiddleware',               # Duplicate, but harmless
 ]
 
+# Root URL configuration
 ROOT_URLCONF = 'backend.urls'
 
+# Template settings
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [],  # List of directories to search for templates
+        'APP_DIRS': True,  # Look for templates inside installed apps
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',  # Add request object to context
+                'django.contrib.auth.context_processors.auth', # Add user object to context
+                'django.contrib.messages.context_processors.messages', # Add messages to context
             ],
         },
     },
 ]
 
+# WSGI application entry point
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
+# Database configuration using environment variables for security
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE'),  
@@ -96,10 +92,7 @@ DATABASES = {
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
+# Password validation settings
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -115,39 +108,32 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
+# Internationalization settings
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = 'static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
+# Default primary key field type for models
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Initialize Google Gemini AI client with API key from environment
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
+# CORS settings: allow requests from frontend running on localhost:5173
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 
+# API keys for external services
 OPENWEATHER_API_KEY = 'b58882e56137707ffa9e46f81614302a'
-NEWSDATA_API_KEY='pub_876386bb80b0aa0bc720184d47290a9c17d77'
-GEMINI_API_KEY= os.getenv("GEMINI_API_KEY")
+NEWSDATA_API_KEY = 'pub_876386bb80b0aa0bc720184d47290a9c17d77'
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
+# Django REST Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',

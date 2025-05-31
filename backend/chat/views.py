@@ -24,33 +24,44 @@ from .utils import (
 )
 from .tasks import send_reminder_sms
 
+# Load environment variables from .env file
 load_dotenv()
 
-# Configure Gemini
+# Configure Gemini AI model
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-2.0-flash")
 
-# Regex for phone and coordinates
+# Regular expressions for phone number and coordinates validation
 PHONE_REGEX = re.compile(r'^\+?\d{10,15}$')
 COORDS_REGEX = re.compile(r'([-+]?\d{1,2}(?:\.\d+)?),\s*([-+]?\d{1,3}(?:\.\d+)?)')
 
 
 class ClearChatView(APIView):
+    """
+    API endpoint to clear all chat history for the authenticated user.
+    """
     permission_classes = [AllowAny]
 
     def delete(self, request):
         email = get_email_from_clerk_request(request)
         if not email:
             return Response({"error": "Unauthorized"}, status=401)
+        # Delete all chat messages and sessions for the user
         ChatMessage.objects.filter(email=email).delete()
         ChatSession.objects.filter(email=email).delete()
         return Response({"status": "Chat history cleared."})
 
 
 class ChatSessionView(APIView):
+    """
+    API endpoint to manage chat sessions (list, create, update, delete).
+    """
     permission_classes = [AllowAny]
 
     def get(self, request):
+        """
+        List all chat sessions for the authenticated user.
+        """
         email = get_email_from_clerk_request(request)
         if not email:
             return Response({"error": "Unauthorized"}, status=401)
@@ -60,6 +71,9 @@ class ChatSessionView(APIView):
         return Response(data)
 
     def post(self, request):
+        """
+        Create a new chat session for the user.
+        """
         email = get_email_from_clerk_request(request)
         print("entering post")
         if not email:
@@ -73,6 +87,9 @@ class ChatSessionView(APIView):
         }, status=status.HTTP_201_CREATED)
 
     def put(self, request, session_id=None):
+        """
+        Update the title of an existing chat session.
+        """
         email = get_email_from_clerk_request(request)
         if not email:
             return Response({"error": "Unauthorized"}, status=401)
@@ -96,6 +113,9 @@ class ChatSessionView(APIView):
             return Response({"error": "Session not found."}, status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, session_id=None):
+        """
+        Delete a specific chat session.
+        """
         email = get_email_from_clerk_request(request)
         if not email:
             return Response({"error": "Unauthorized"}, status=401)
@@ -109,9 +129,16 @@ class ChatSessionView(APIView):
             return Response({"error": "Session not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class GeminiChatView(APIView):
+    """
+    API endpoint for chat interaction using Gemini AI model.
+    Handles user messages, reminders, weather, and price scraping.
+    """
     permission_classes = [AllowAny]
 
     def post(self, request, session_id):
+        """
+        Handle user message, interact with Gemini AI, and perform actions.
+        """
         email = get_email_from_clerk_request(request)
         if not email:
             return Response({"error": "Unauthorized"}, status=401)
@@ -123,6 +150,7 @@ class GeminiChatView(APIView):
         try:
             session = ChatSession.objects.get(id=session_id, email=email)
 
+            # Ask for phone number if not set
             if not session.phone_number:
                 if PHONE_REGEX.match(user_message):
                     session.phone_number = user_message
@@ -134,6 +162,7 @@ class GeminiChatView(APIView):
                     reply = "Hi! To get started, please share your phone number (include country code if applicable)."
                     return Response({"reply": reply, "actions": []})
 
+            # Prepare chat history for Gemini
             past_msgs = ChatMessage.objects.filter(email=email, session_id=session_id).order_by("timestamp")
             history = [{"role": m.role, "parts": [m.content]} for m in past_msgs]
             system_prompt = (
@@ -142,8 +171,10 @@ class GeminiChatView(APIView):
                 "soil care, yield predictions, and market prices. Do NOT answer any non-agriculture questions. If the user asks anything off-topic, politely guide them back to agriculture. You can also schedulre reminders for the user. "
             )
 
+            # Start chat with system prompt and history
             session_chat = model.start_chat(history=[{"role": "user", "parts": [system_prompt]}] + history)
 
+            # Handle reminder confirmation
             if user_message.lower() == "yes":
                 pending = PendingReminder.objects.filter(email=email).last()
                 if pending:
@@ -155,16 +186,20 @@ class GeminiChatView(APIView):
                     pending.delete()
                 ai_reply = "Reminder confirmed and scheduled."
             else:
+                # Get AI response
                 response = session_chat.send_message(user_message)
                 ai_reply = response.text
 
+                # Save user and assistant messages
                 ChatMessage.objects.create(email=email, role="user", content=user_message, session=session)
                 ChatMessage.objects.create(email=email, role="assistant", content=ai_reply, session=session)
 
+                # Check for reminder requests in user message
                 reminder_response = check_for_reminder(email, user_message, from_gemini=True)
                 if reminder_response:
                     actions.append(reminder_response)
 
+                # Handle weather info requests
                 if "weather" in user_message.lower():
                     if latitude is not None and longitude is not None:
                         weather_response = get_weather_info(lat=latitude, lon=longitude)
@@ -177,6 +212,7 @@ class GeminiChatView(APIView):
                     if weather_response:
                         actions.append(weather_response)
 
+                # Handle price/product info requests
                 if any(word in user_message.lower() for word in ["price", "buy", "cost", "amazon", "flipkart"]):
                     product_response = trigger_price_scraping(user_message)
                     if product_response:
@@ -192,6 +228,9 @@ class GeminiChatView(APIView):
             return Response({"error": "Internal server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get(self, request, session_id):
+        """
+        Retrieve chat history for a session.
+        """
         email = get_email_from_clerk_request(request)
         if not email:
             return Response({"error": "Unauthorized"}, status=401)
@@ -204,6 +243,10 @@ class GeminiChatView(APIView):
 @api_view(["POST"])
 @parser_classes([MultiPartParser])
 def revup_stt_proxy(request):
+    """
+    Proxy endpoint for speech-to-text using RevUp API.
+    Accepts an audio file and returns the transcription.
+    """
     audio_file = request.FILES.get("audio")
     if not audio_file:
         return JsonResponse({"error": "No audio file provided."}, status=400)
