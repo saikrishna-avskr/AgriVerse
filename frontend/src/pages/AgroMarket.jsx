@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+// Importing icons from lucide-react for UI elements
 import { Search, ShoppingCart, Star, Filter, Grid, List, ChevronRight, Zap, Shield, Award } from 'lucide-react';
+// Importing product images
 import soilPhTester from '../assets/ph.png';
 import moisture from '../assets/moisture.png';
 import spray from '../assets/spray.png';
@@ -15,9 +17,12 @@ import vermi from '../assets/vermi.png';
 import green from '../assets/green.png';
 import bin from '../assets/bin.png';
 import pre from '../assets/pre.png';
-// Sample images - in your actual implementation, these would be your imported images
 
+// =====================
+// Product Data Section
+// =====================
 
+// Array of featured products with details for display
 const featuredProducts = [
   {
     name: 'Soil pH Tester Kit',
@@ -192,16 +197,31 @@ const featuredProducts = [
   },
 ];
 
-const categories = ['All', 'Testing Equipment', 'Hand Tools', 'Spraying Tools', 'Power Tools', 'Fertilizers', 'Nursery Supplies', 'Irrigation', 'Structures', 'Composting', 'Cutting Tools'];
+// List of product categories for filtering
+const categories = [
+  'All', 'Testing Equipment', 'Hand Tools', 'Spraying Tools', 'Power Tools',
+  'Fertilizers', 'Nursery Supplies', 'Irrigation', 'Structures', 'Composting', 'Cutting Tools'
+];
+
+// =====================
+// Main Component
+// =====================
 
 const AgroMarket = () => {
+  // State for search input
   const [searchTerm, setSearchTerm] = useState('');
+  // State for selected category filter
   const [selectedCategory, setSelectedCategory] = useState('All');
+  // State for grid/list view toggle
   const [viewMode, setViewMode] = useState('grid');
+  // State for filtered products to display
   const [filteredProducts, setFilteredProducts] = useState(featuredProducts);
+  // State for sorting method
   const [sortBy, setSortBy] = useState('popularity');
 
+  // Effect: Filter and sort products whenever search, category, or sort changes
   useEffect(() => {
+    // Filter products by search term and category
     let filtered = featuredProducts.filter(product => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            product.category.toLowerCase().includes(searchTerm.toLowerCase());
@@ -209,7 +229,7 @@ const AgroMarket = () => {
       return matchesSearch && matchesCategory;
     });
 
-    // Sort products
+    // Sort products based on selected sort method
     switch (sortBy) {
       case 'price-low':
         filtered.sort((a, b) => parseInt(a.price.replace('₹', '').replace(',', '')) - parseInt(b.price.replace('₹', '').replace(',', '')));
@@ -221,12 +241,13 @@ const AgroMarket = () => {
         filtered.sort((a, b) => b.rating - a.rating);
         break;
       default:
-        filtered.sort((a, b) => b.reviews - a.reviews);
+        filtered.sort((a, b) => b.reviews - a.reviews); // Popularity by reviews
     }
 
     setFilteredProducts(filtered);
   }, [searchTerm, selectedCategory, sortBy]);
 
+  // Helper function: Render star icons for product rating
   const renderStars = (rating) => {
     return [...Array(5)].map((_, i) => (
       <Star
@@ -236,25 +257,27 @@ const AgroMarket = () => {
     ));
   };
 
+  // Product card component for each product
   const ProductCard = ({ product }) => (
     <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden">
-      {/* Product Badges */}
+      {/* Product Badges (Popular/New/Discount) */}
       <div className="relative">
         <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+          {/* Show "Popular" badge if product is popular */}
           {product.isPopular && (
             <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
               <Zap className="w-3 h-3" />
               Popular
             </span>
           )}
+          {/* Show "New" badge if product is new */}
           {product.isNew && (
             <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
               New
             </span>
           )}
         </div>
-        
-        {/* Discount Badge */}
+        {/* Discount Badge if original price exists */}
         {product.originalPrice && (
           <div className="absolute top-4 right-4 z-10">
             <span className="bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-bold">
@@ -262,7 +285,7 @@ const AgroMarket = () => {
             </span>
           </div>
         )}
-
+        {/* Product Image */}
         <div className="aspect-w-16 aspect-h-12 bg-gradient-to-br from-gray-50 to-gray-100 p-6">
           <img
             src={product.image}
@@ -273,17 +296,15 @@ const AgroMarket = () => {
       </div>
 
       <div className="p-6 space-y-4">
-        {/* Category */}
+        {/* Category Badge */}
         <span className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
           {product.category}
         </span>
-
         {/* Product Name */}
         <h3 className="text-lg font-bold text-gray-900 group-hover:text-green-600 transition-colors line-clamp-2">
           {product.name}
         </h3>
-
-        {/* Rating */}
+        {/* Rating and Reviews */}
         <div className="flex items-center gap-2">
           <div className="flex">
             {renderStars(product.rating)}
@@ -291,8 +312,7 @@ const AgroMarket = () => {
           <span className="text-sm font-medium text-gray-700">{product.rating}</span>
           <span className="text-sm text-gray-500">({product.reviews} reviews)</span>
         </div>
-
-        {/* Features */}
+        {/* Product Features (first two) */}
         <div className="space-y-1">
           {product.features.slice(0, 2).map((feature, idx) => (
             <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
@@ -301,16 +321,14 @@ const AgroMarket = () => {
             </div>
           ))}
         </div>
-
-        {/* Price */}
+        {/* Price and Original Price */}
         <div className="flex items-center gap-3">
           <span className="text-2xl font-bold text-gray-900">{product.price}</span>
           {product.originalPrice && (
             <span className="text-lg text-gray-500 line-through">{product.originalPrice}</span>
           )}
         </div>
-
-        {/* Action Button */}
+        {/* Buy Button (links to Amazon) */}
         <a
           href={product.link}
           target="_blank"
@@ -325,9 +343,12 @@ const AgroMarket = () => {
     </div>
   );
 
+  // =====================
+  // Render Section
+  // =====================
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
-      {/* Hero Section */}
+      {/* Hero Section with title and trust indicators */}
       <div className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-white">
         <div className="container mx-auto px-6 py-16">
           <div className="text-center max-w-4xl mx-auto">
@@ -341,7 +362,6 @@ const AgroMarket = () => {
               Discover professional-grade farming tools with the best prices and quality guarantee. 
               Trusted by thousands of farmers across India.
             </p>
-            
             {/* Trust Indicators */}
             <div className="flex flex-wrap justify-center gap-8 text-sm">
               <div className="flex items-center gap-2">
@@ -361,11 +381,12 @@ const AgroMarket = () => {
         </div>
       </div>
 
+      {/* Main Content Section */}
       <div className="container mx-auto px-6 py-12">
-        {/* Search and Filter Section */}
+        {/* Search, Category Filter, and Sort Controls */}
         <div className="bg-white rounded-3xl shadow-xl p-8 mb-12 border border-gray-100">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Search */}
+            {/* Search Input */}
             <div className="lg:col-span-2 relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -374,6 +395,7 @@ const AgroMarket = () => {
                 className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors text-lg"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                // On Enter, search on Amazon
                 onKeyPress={(e) => {
                   if (e.key === 'Enter' && searchTerm.trim()) {
                     const amazonUrl = `https://www.amazon.in/s?k=${encodeURIComponent(searchTerm + ' agriculture farming tools')}&tag=yourtag-21`;
@@ -381,6 +403,7 @@ const AgroMarket = () => {
                   }
                 }}
               />
+              {/* Search on Amazon Button */}
               {searchTerm && (
                 <button
                   onClick={() => {
@@ -393,8 +416,7 @@ const AgroMarket = () => {
                 </button>
               )}
             </div>
-
-            {/* Category Filter */}
+            {/* Category Filter Dropdown */}
             <div>
               <select
                 className="w-full py-4 px-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors text-lg bg-white"
@@ -406,8 +428,7 @@ const AgroMarket = () => {
                 ))}
               </select>
             </div>
-
-            {/* Sort */}
+            {/* Sort Dropdown */}
             <div>
               <select
                 className="w-full py-4 px-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-colors text-lg bg-white"
@@ -423,7 +444,7 @@ const AgroMarket = () => {
           </div>
         </div>
 
-        {/* Results Header */}
+        {/* Results Header: Shows current filter and product count */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
@@ -434,8 +455,7 @@ const AgroMarket = () => {
               {searchTerm && ` for "${searchTerm}"`}
             </p>
           </div>
-
-          {/* View Toggle */}
+          {/* View Toggle Buttons */}
           <div className="flex bg-gray-100 rounded-xl p-1">
             <button
               onClick={() => setViewMode('grid')}
@@ -456,7 +476,7 @@ const AgroMarket = () => {
           </div>
         </div>
 
-        {/* Products Grid */}
+        {/* Products Grid/List */}
         {filteredProducts.length > 0 ? (
           <div className={`grid gap-8 ${
             viewMode === 'grid' 
@@ -468,6 +488,7 @@ const AgroMarket = () => {
             ))}
           </div>
         ) : (
+          // No products found message
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🔍</div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">No products found</h3>
@@ -484,8 +505,6 @@ const AgroMarket = () => {
           </div>
         )}
       </div>
-
-
     </div>
   );
 };

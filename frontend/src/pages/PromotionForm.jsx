@@ -1,10 +1,12 @@
 import React, { useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
 
+// PromotionForm component: Displays promotions and allows users to submit their own promotion
 export default function PromotionForm() {
-  const form = useRef();
-  const [status, setStatus] = useState("");
+  const form = useRef(); // Ref for the form element
+  const [status, setStatus] = useState(""); // Status message for submission feedback
 
+  // Handles form submission and sends data via EmailJS
   const sendEmail = (e) => {
     e.preventDefault();
     setStatus("Sending...");
@@ -14,12 +16,12 @@ export default function PromotionForm() {
         "service_8tz9wa3",      // Replace with your EmailJS service ID
         "template_gxhel1x",     // Replace with your EmailJS template ID
         form.current,
-        "hEkKhT8DapILXCLE7"       // Replace with your EmailJS public key
+        "hEkKhT8DapILXCLE7"     // Replace with your EmailJS public key
       )
       .then(
         () => {
           setStatus("Promotion submitted successfully!");
-          form.current.reset();
+          form.current.reset(); // Reset form fields after success
         },
         (error) => {
           console.error(error.text);
@@ -28,6 +30,7 @@ export default function PromotionForm() {
       );
   };
 
+  // Example promotions to display as cards
   const promotions = [
     {
       title: "Drone",
@@ -48,6 +51,7 @@ export default function PromotionForm() {
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
+      {/* Page title */}
       <h1 className="text-3xl font-bold text-center mb-8 text-purple-700">Promotions</h1>
 
       <div className="grid md:grid-cols-2 gap-8">
@@ -76,6 +80,7 @@ export default function PromotionForm() {
           className="bg-white p-6 rounded-2xl shadow-md space-y-4 border"
         >
           <h2 className="text-2xl font-semibold text-purple-600 mb-4">Submit Your Promotion</h2>
+          {/* Name input */}
           <input
             className="p-3 border rounded-xl w-full"
             type="text"
@@ -83,6 +88,7 @@ export default function PromotionForm() {
             placeholder="Your Name"
             required
           />
+          {/* Email input */}
           <input
             className="p-3 border rounded-xl w-full"
             type="email"
@@ -90,6 +96,7 @@ export default function PromotionForm() {
             placeholder="Your Email"
             required
           />
+          {/* Promotion title input */}
           <input
             className="p-3 border rounded-xl w-full"
             type="text"
@@ -97,6 +104,7 @@ export default function PromotionForm() {
             placeholder="Promotion Title"
             required
           />
+          {/* Description textarea */}
           <textarea
             className="p-3 border rounded-xl w-full"
             name="description"
@@ -104,6 +112,7 @@ export default function PromotionForm() {
             rows="5"
             required
           />
+          {/* Link input */}
           <input
             className="p-3 border rounded-xl w-full"
             type="url"
@@ -111,12 +120,14 @@ export default function PromotionForm() {
             placeholder="Link to product/website"
             required
           />
+          {/* Submit button */}
           <button
             type="submit"
             className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-xl w-full"
           >
             Submit Promotion
           </button>
+          {/* Status message after submission */}
           {status && (
             <p className="text-center text-sm text-green-600 mt-2">{status}</p>
           )}
