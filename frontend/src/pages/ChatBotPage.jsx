@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import "./ChatBot.css";
 import { useAuth, useUser, SignIn, SignOutButton } from "@clerk/clerk-react";
 import Navbar from "../components/Navbar";
 
-// Base URL for backend API
 const API_BASE = "http://localhost:8000/api";
 
-// Helper to get Axios config with auth token
-const getAxiosConfig = async () => {
-  const { getToken } = useAuth();
+const getAxiosConfig = async (getToken) => {
   const token = await getToken({ template: "updated" });
   return {
     headers: {
@@ -21,28 +18,29 @@ const getAxiosConfig = async () => {
 };
 
 export default function ChatBotPage() {
-  // Clerk authentication and user info
   const { isSignedIn, getToken } = useAuth();
   const { user } = useUser();
 
-  // State variables for chat, sessions, TTS, and audio recording
-  const [message, setMessage] = useState(""); // Current input message
-  const [chatHistory, setChatHistory] = useState([]); // Messages in current chat
-  const [sessions, setSessions] = useState([]); // All chat sessions
-  const [activeSession, setActiveSession] = useState(null); // Current session ID
-  const [editingSessionId, setEditingSessionId] = useState(null); // Session being renamed
-  const [newTitle, setNewTitle] = useState(""); // New session title
-  const [ttsEnabled, setTtsEnabled] = useState(true); // Text-to-speech toggle
-  const [voices, setVoices] = useState([]); // Available TTS voices
-  const [selectedVoice, setSelectedVoice] = useState(null); // Selected TTS voice
-  const [isRecording, setIsRecording] = useState(false); // Audio recording state
-  const [mediaRecorder, setMediaRecorder] = useState(null); // MediaRecorder instance
-  const [audioChunks, setAudioChunks] = useState([]); // Audio data chunks
-  const [sending, setSending] = useState(false); // Sending message state
-  const [awaitingPhoneNumber, setAwaitingPhoneNumber] = useState(false); // If bot asks for phone number
-  const [location, setLocation] = useState({ latitude: null, longitude: null }); // User's geolocation
+  const [message, setMessage] = useState("");
+  const [chatHistory, setChatHistory] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [activeSession, setActiveSession] = useState(null);
+  const [editingSessionId, setEditingSessionId] = useState(null);
+  const [newTitle, setNewTitle] = useState("");
+  const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [voices, setVoices] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [awaitingPhoneNumber, setAwaitingPhoneNumber] = useState(false);
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
 
-  // On mount: Get user's geolocation (if available)
+  // Use refs to maintain stable references
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const streamRef = useRef(null);
+
+  // Get location on mount
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -59,7 +57,7 @@ export default function ChatBotPage() {
     }
   }, []);
 
-  // On mount: Load available voices for TTS
+  // Load voices for TTS
   useEffect(() => {
     const loadVoices = () => {
       const availableVoices = window.speechSynthesis.getVoices();
@@ -74,14 +72,13 @@ export default function ChatBotPage() {
     }
   }, [selectedVoice]);
 
-  // When signed in, fetch chat sessions from backend
+  // Fetch sessions when signed in
   useEffect(() => {
     if (isSignedIn) {
       fetchSessions();
     }
   }, [isSignedIn]);
 
-  // Fetch all chat sessions for the user
   const fetchSessions = async () => {
     const token = await getToken({ template: "updated" });
     console.log("Fetching sessions with token:", token);
@@ -93,7 +90,6 @@ export default function ChatBotPage() {
     }
   };
 
-  // Fetch chat history for a given session
   const fetchChatHistory = async (sessionId) => {
     const token = await getToken({ template: "updated" });
     const res = await fetch(`${API_BASE}/chat/${sessionId}/`, {
@@ -104,7 +100,6 @@ export default function ChatBotPage() {
     }
   };
 
-  // Send a message to the bot and update chat history
   const handleSend = async () => {
     if (!message.trim() || !activeSession) return;
     setSending(true);
@@ -123,17 +118,23 @@ export default function ChatBotPage() {
     });
     if (res.ok) {
       const data = await res.json();
-      setChatHistory((prev) => [
-        ...prev,
+      const newMessages = [
+        ...chatHistory,
         { role: "user", content: message },
         { role: "assistant", content: data.reply },
-      ]);
+      ];
+      setChatHistory(newMessages);
       setMessage("");
+
+      // Speak the bot's response
+      if (ttsEnabled && data.reply) {
+        // Small delay to ensure the message is rendered first
+        setTimeout(() => speakText(data.reply), 100);
+      }
     }
     setSending(false);
   };
 
-  // Create a new chat session
   const handleNewSession = async () => {
     try {
       const token = await getToken({ template: "updated" });
@@ -151,13 +152,11 @@ export default function ChatBotPage() {
     }
   };
 
-  // Start editing a session title
   const startEditing = (id, currentTitle) => {
     setEditingSessionId(id);
     setNewTitle(currentTitle);
   };
 
-  // Save the new session title to backend
   const saveTitle = async (id) => {
     if (!newTitle.trim()) {
       alert("Title cannot be empty");
@@ -177,7 +176,6 @@ export default function ChatBotPage() {
     }
   };
 
-  // Delete a chat session
   const handleDeleteSession = async (id) => {
     if (!window.confirm("Are you sure you want to delete this chat?")) return;
     try {
@@ -195,54 +193,44 @@ export default function ChatBotPage() {
     }
   };
 
-  // Audio recording effect: handles starting/stopping and sending audio to backend
-  useEffect(() => {
-    let recorder;
-    let stream;
+  // Text-to-Speech functionality
+  const speakText = (text) => {
+    if (!ttsEnabled || !text.trim()) return;
 
-    if (isRecording) {
-      navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then((micStream) => {
-          stream = micStream;
-          recorder = new MediaRecorder(stream);
-          setMediaRecorder(recorder);
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
 
-          recorder.start();
+    const utterance = new SpeechSynthesisUtterance(text);
 
-          recorder.ondataavailable = (e) => {
-            setAudioChunks((prev) => [...prev, e.data]);
-          };
-
-          recorder.onstop = () => {
-            const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
-            sendAudioToRevUp(audioBlob);
-            setAudioChunks([]);
-            stream.getTracks().forEach((track) => track.stop());
-          };
-        })
-        .catch(() => {
-          alert("Microphone permission denied");
-          setIsRecording(false);
-        });
+    // Set voice if selected
+    if (selectedVoice) {
+      const voice = voices.find((v) => v.name === selectedVoice);
+      if (voice) {
+        utterance.voice = voice;
+      }
     }
 
-    // Cleanup: stop recording and release resources
-    return () => {
-      if (recorder?.state === "recording") recorder.stop();
-      if (stream) stream.getTracks().forEach((track) => track.stop());
-    };
-  }, [isRecording]);
+    // Configure speech settings
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.volume = 0.8;
 
-  // Send recorded audio to backend for speech-to-text
+    // Error handling
+    utterance.onerror = (event) => {
+      console.error("Speech synthesis error:", event.error);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
   const sendAudioToRevUp = async (audioBlob) => {
     try {
-      const config = await getAxiosConfig();
+      const config = await getAxiosConfig(getToken);
       const formData = new FormData();
       formData.append("audio", audioBlob, "audio.webm");
 
-      // Add multipart header
-      config.headers["Content-Type"] = "multipart/form-data";
+      // Remove Content-Type header to let browser set it with boundary
+      delete config.headers["Content-Type"];
 
       const response = await axios.post(
         `${API_BASE}/revup_stt_proxy/`,
@@ -255,32 +243,91 @@ export default function ChatBotPage() {
           (prev) => (prev ? prev + " " : "") + response.data.transcript
         );
       }
-    } catch {
+    } catch (error) {
+      console.error("Speech recognition error:", error);
       alert("Speech recognition failed. Please try again.");
     }
   };
 
-  // Toggle audio recording state
-  const toggleRecording = () => {
-    if (isRecording) {
-      mediaRecorder?.stop();
-      setIsRecording(false);
-    } else {
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+
+      const recorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+          ? "audio/webm;codecs=opus"
+          : "audio/webm",
+      });
+
+      mediaRecorderRef.current = recorder;
+      audioChunksRef.current = [];
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      recorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: recorder.mimeType || "audio/webm",
+        });
+        sendAudioToRevUp(audioBlob);
+
+        // Clean up
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
+        audioChunksRef.current = [];
+      };
+
+      recorder.start(100); // Collect data every 100ms
       setIsRecording(true);
+    } catch (error) {
+      console.error("Failed to start recording:", error);
+      alert("Microphone permission denied or not available");
+      setIsRecording(false);
     }
   };
 
-  // If not signed in, show sign-in page
+  const stopRecording = () => {
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state === "recording"
+    ) {
+      mediaRecorderRef.current.stop();
+    }
+    setIsRecording(false);
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current?.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
   if (!isSignedIn) {
     return <SignIn />;
   }
 
-  // =========================
-  // Render ChatBot UI
-  // =========================
   return (
     <div className="app">
-      {/* Sidebar: Chat sessions list and controls */}
       <div className="sidebar">
         <h3>Chats</h3>
         <button onClick={handleNewSession} disabled={sending}>
@@ -290,7 +337,6 @@ export default function ChatBotPage() {
           {sessions.map((s) => (
             <li key={s.id} className={s.id === activeSession ? "active" : ""}>
               <div className="chat-session-item">
-                {/* Session title: editable on double click */}
                 {editingSessionId === s.id ? (
                   <input
                     value={newTitle}
@@ -315,7 +361,6 @@ export default function ChatBotPage() {
                   </span>
                 )}
 
-                {/* Delete session button */}
                 <button
                   onClick={() => handleDeleteSession(s.id)}
                   disabled={sending}
@@ -323,7 +368,6 @@ export default function ChatBotPage() {
                   className="delete-button"
                   style={{ margin: "auto" }}
                 >
-                  {/* Trash icon SVG */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
@@ -348,10 +392,8 @@ export default function ChatBotPage() {
         </ul>
       </div>
 
-      {/* Main chat area */}
       <div className="chat-container">
         <Navbar />
-        {/* Chat history display */}
         <div className="chat-history">
           {chatHistory.map((msg, idx) => (
             <div
@@ -359,11 +401,54 @@ export default function ChatBotPage() {
               className={`chat-message ${msg.role === "user" ? "user" : "bot"}`}
             >
               <ReactMarkdown>{msg.content}</ReactMarkdown>
+              {msg.role === "assistant" && (
+                <button
+                  className="speak-button"
+                  onClick={() => speakText(msg.content)}
+                  title="Read aloud"
+                  disabled={!ttsEnabled}
+                >
+                  🔊
+                </button>
+              )}
             </div>
           ))}
         </div>
 
-        {/* Chat input area */}
+        <div className="tts-controls">
+          <label>
+            <input
+              type="checkbox"
+              checked={ttsEnabled}
+              onChange={(e) => setTtsEnabled(e.target.checked)}
+            />
+            Enable Text-to-Speech
+          </label>
+
+          {voices.length > 0 && (
+            <select
+              value={selectedVoice || ""}
+              onChange={(e) => setSelectedVoice(e.target.value)}
+              disabled={!ttsEnabled}
+            >
+              <option value="">Default Voice</option>
+              {voices.map((voice) => (
+                <option key={voice.name} value={voice.name}>
+                  {voice.name} ({voice.lang})
+                </option>
+              ))}
+            </select>
+          )}
+
+          <button
+            onClick={() => window.speechSynthesis.cancel()}
+            disabled={!ttsEnabled}
+            title="Stop speaking"
+          >
+            🔇 Stop
+          </button>
+        </div>
+
         <div className="chat-input">
           <input
             type="text"
@@ -382,6 +467,14 @@ export default function ChatBotPage() {
               }
             }}
           />
+          <button
+            onClick={toggleRecording}
+            disabled={sending}
+            className={`record-button ${isRecording ? "recording" : ""}`}
+            title={isRecording ? "Stop recording" : "Start recording"}
+          >
+            {isRecording ? "🔴" : "🎤"}
+          </button>
           <button onClick={handleSend} disabled={sending}>
             Send
           </button>

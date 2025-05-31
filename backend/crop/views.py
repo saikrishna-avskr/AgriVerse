@@ -21,6 +21,7 @@ def predict_disease_view(request):
             image_file = request.FILES['image']
             image_bytes = image_file.read()
             language = request.POST.get('Language', 'english')
+            mode = request.POST.get('mode', 'gemini')
             # Prompt for Gemini model to analyze the image and provide diagnosis and advice
             prompt = f"""
             This is a photo of a crop leaf. Identify:
@@ -47,6 +48,12 @@ def predict_disease_view(request):
             )
             # Encode image to base64 for frontend display
             image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+            if mode == 'gemini':
+                return JsonResponse({'result': response.text, 'image': image_base64}, status=200)
+            elif mode == 'model':
+                url = "https://susya.onrender.com"
+                response = requests.post(url,json = {"image":image_base64})
+                print(response.text.strip())
             return JsonResponse({'result': response.text,'image': image_base64}, status=200)
         except Exception as e:
             print(f"Error: {e}")

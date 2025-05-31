@@ -83,6 +83,19 @@ export default function DiseaseDetectionPage() {
           placeholder=" eg..English(default)"
           className="border border-black"
         />
+        <br />
+        {/* Mode dropdown */}
+        <label htmlFor="mode" className="block text-emerald-800 font-semibold mb-2">
+          Mode:
+        </label>
+        <select
+          id="mode"
+          name="mode"
+          className="block w-full border border-emerald-200 rounded-xl px-3 py-2 bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-400 mb-2"
+        >
+          <option value="model">model</option>
+          <option value="gemini">gemini</option>
+        </select>
         {/* Submit button */}
         <button
           type="submit"

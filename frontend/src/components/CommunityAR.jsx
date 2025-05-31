@@ -1,5 +1,5 @@
 import React from "react";
-import './CommunityAR.css';
+import "./CommunityAR.css";
 import arimg from "../assets/ar.jpg"; // Background image
 
 // CommunityAR component displays a VR farm world immersive experience section
@@ -20,7 +20,7 @@ const CommunityAR = () => {
         <div className="card">
           {/* Link to launch the VR experience in a new tab */}
           <a
-            href="/frame.html"
+            href="https://agrivr.onrender.com"
             target="_blank"
             rel="noopener noreferrer"
             className="block"
@@ -29,7 +29,8 @@ const CommunityAR = () => {
             <p className="card-title">Launch VR Experience</p>
             {/* Card description */}
             <p className="card-desc">
-              Step into our interactive VR farm world and explore modern agriculture through a fully immersive and educational experience.
+              Step into our interactive VR farm world and explore modern
+              agriculture through a fully immersive and educational experience.
             </p>
           </a>
         </div>
